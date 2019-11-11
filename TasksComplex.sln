@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29503.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TasksSpa", "TasksSpa\TasksSpa.csproj", "{AD73C998-9FF3-468A-9F09-197EEE4F7CEB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{AD73C998-9FF3-468A-9F09-197EEE4F7CEB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD73C998-9FF3-468A-9F09-197EEE4F7CEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD73C998-9FF3-468A-9F09-197EEE4F7CEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD73C998-9FF3-468A-9F09-197EEE4F7CEB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B4813FA3-A434-461D-9736-697EA84DC288}
+	EndGlobalSection
+EndGlobal
