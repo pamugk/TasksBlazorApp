@@ -1,0 +1,20 @@
+﻿@inherits LayoutComponentBase
+
+<NavMenu />
+
+<main class="main">
+    <div class="container mt-5">
+        @Body
+    </div>
+</main>
+
+<footer class="footer font-small blue">
+    <p class="text-center">
+        Пермь, ПГНИУ, 30 октября 2019.<br>
+        Склёпано на коленке криворуким студентом© по best practice.
+    </p>
+</footer>
+
+@code{
+    private Model.User User { get; set; }
+}

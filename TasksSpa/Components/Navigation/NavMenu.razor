@@ -1,0 +1,27 @@
+﻿<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="">TasksSpa</a>
+
+    <ul class="navbar-nav mr-auto">
+        <NavItem Classes="oi oi-home" Link="" Match="NavLinkMatch.All" Text="Главная"/>
+        <NavItem Classes="oi oi-plus" Link="tasks" Text="Задачи"/>
+        <NavItem Classes="oi oi-list-rich" Link="about" Text="О сайте"/>
+    </ul>
+
+    <ul>
+        @if (@UserIsLoggedIn)
+        {
+            <NavItem Classes="fas fa-user-circle" Link="" Text="@UserLogin" />
+            <NavItem Classes="fas fa-sign-out-alt" Link="logout" Text="Выход" />
+        }
+        else
+        {
+            <NavItem Classes="fas fa-sign-in-alt" Link="login" Text="Вход" />
+            <NavItem Classes="fas fa-user-plus" Link="registration" Text="Регистрация" />
+        }
+    </ul>
+</nav>
+    
+@code {
+    public bool UserIsLoggedIn { get; set; }
+    public string UserLogin { get; set; }
+}

@@ -1,0 +1,25 @@
+﻿<div class="rowcard card-default w-50 mx-auto col-sm">
+    <h4 class="card-header">@Header</h4>
+    <div id="error" class="alert alert-danger" style="display: none"></div>
+    <form>
+        <TextInput @bind-Text="Title" Label="Заголовок:" Placeholder="Заголовок"/>
+        <TextInput @bind-Text="Description" Label="Описание:" Placeholder="Такая-то задача"/>
+        <CheckboxInput />
+        <input type="button" class="btn btn-primary" @onclick="Accept" value="@AcceptBtnText" />
+    </form>
+</div>
+
+@code {
+    [Parameter]
+    public string AcceptBtnText { get; set; }
+    [Parameter]
+    public string Header { get; set; }
+    
+    private string Description { get; set; }
+    private string Title { get; set; }
+
+    private void Accept()
+    {
+
+    }
+}

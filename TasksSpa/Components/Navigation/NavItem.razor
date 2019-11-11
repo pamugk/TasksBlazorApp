@@ -1,0 +1,16 @@
+﻿<li class="nav-item">
+    <NavLink class="nav-link" href="@Link" Match="@Match">
+        <span class="@Classes" aria-hidden="true"></span> @Text
+    </NavLink>
+</li>
+
+@code {
+    [Parameter]
+    public string Classes { get; set; }
+    [Parameter]
+    public string Link { get; set; }
+    [Parameter]
+    public NavLinkMatch Match { get; set; }
+    [Parameter]
+    public string Text { get; set; }
+}

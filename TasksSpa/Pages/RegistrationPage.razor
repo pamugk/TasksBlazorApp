@@ -1,0 +1,36 @@
+﻿@page "/registration"
+
+<section class="card card-default mx-auto w-50 mx-auto">
+    <h4 class="card-header">Регистрация</h4>
+    <ErrorMessage @bind-Text="ErrorText" />
+    <form class="card-body">
+        <TextInput Label="Логин:" Placeholder="Логин" @bind-Text="Login" />
+        <PasswordInput Label="Пароль:" @bind-Password="Password" />
+        <PasswordInput Label="Повтор пароля:" @bind-Password="PasswordRepeat" />
+        <input type="button" class="btn btn-primary" @onclick="Registration" value="Зарегистрироваться" />
+    </form>
+</section>
+
+@code {
+    private string ErrorText { get; set; }
+    private string Login { get; set; }
+    private string Password { get; set; }
+    private string PasswordRepeat { get; set; }
+
+    private void Registration()
+    {
+        ErrorText = null;
+        if (Login == null)
+            ErrorText = "Требуется ввести логин";
+        else if (!InputValidator.LoginIsValid(Login))
+            ErrorText = "Введённый логин пуст или содержит запрещённые символы";
+        else if (Password == null)
+            ErrorText = "Требуется ввести пароль";
+        else if (!InputValidator.PasswordIsValid(Password))
+            ErrorText = "Введённый пароль пуст или содержит запрещённые символы";
+        else if (PasswordRepeat == null || PasswordRepeat.Trim().Length == 0)
+            ErrorText = "Требуется ввести повтор пароля";
+        else if (!Password.Equals(PasswordRepeat))
+            ErrorText = "Пароли не совпадают";
+    }
+}

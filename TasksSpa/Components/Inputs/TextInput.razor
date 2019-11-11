@@ -1,0 +1,13 @@
+﻿<div class="form-group">
+    <label for="text-input">@Label</label>
+    <input @bind-value="Text" @bind-value:event="oninput" class="form-control" id="text-input" placeholder="@Placeholder" />
+</div>
+
+@code {
+    [Parameter]
+    public string Label { get; set; }
+    [Parameter]
+    public string Placeholder { get; set; }
+
+    public string Text { get; private set; }
+}

@@ -1,0 +1,12 @@
+﻿<li class="list-group-item list-group-item-action task-item">
+    <input type="checkbox">
+    <a class="ml-auto @TaskStatusClass" href="http://localhost:5000/tasks/{{task.id}}">@Task.Title</a>
+    <button class="btn btn-danger btn-sm btn-remove-todo ml-auto">Удалить</button>
+</li>
+
+@code {
+    [Parameter]
+    public Model.Task Task { get; set; }
+
+    private string TaskStatusClass => Task.IsFinished ? "completed-task" : null;
+}
