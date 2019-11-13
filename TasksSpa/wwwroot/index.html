@@ -8,16 +8,18 @@
     <base href="/" />
     <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <link href="css/site.css" rel="stylesheet" />
-    <script defer src="fontawesome/js/solid.min.js"></script>
-    <script defer src="fontawesome/js/fontawesome.min.js"></script>
 </head>
 
 <body>
-    <app>Загрузка...</app>
+    <app>
+        <div class="text-center m-5">
+            <div class="spinner-border"></div>
+        </div>
+    </app>
 
     <div id="blazor-error-ui">
         Внезапно что-то пошло не так.
-        <a href="" class="reload">Перезагрузить</a>
+        <a href="" class="reload">Перезагрузить страницу</a>
         <a class="dismiss">🗙</a>
     </div>
     <script src="_framework/blazor.webassembly.js"></script>

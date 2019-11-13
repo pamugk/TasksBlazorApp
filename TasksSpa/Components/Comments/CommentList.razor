@@ -1,0 +1,19 @@
+﻿@if (Comments == null)
+{
+    <LoadingSpinner Enabled="true" />
+}
+else
+{
+    <ul class="list-group">
+        @foreach (var task in Comments)
+        {
+            <CommentItem Task=task />
+        }
+    </ul>
+}
+
+
+@code {
+    [Parameter]
+    public CommentDto[] Comments { get; set; }
+}

@@ -2,29 +2,24 @@
 
 <section class="card card-default w-50 mx-auto">
     <h4 class="card-header">Вход</h4>
-    <ErrorMessage @bind-Text="ErrorText"/>
-    <form class="card-body">
-        <TextInput Label="Логин:" Placeholder="Логин" @bind-Text="Login"/>
-        <PasswordInput Label="Пароль:" @bind-Password="Password"/>
-        <input type="button" class="btn btn-primary" @onclick="LogIn" value="Войти" />
-    </form>
+    <EditForm Model="@User" OnValidSubmit="@LogIn">
+        <div class="form-group">
+            <label for="login">Логин: </label>
+            <InputText @bind-Value="User.Login" id="login" placeholder="Логин" />
+        </div>
+        <div class="form-group">
+            <label for="password">Пароль: </label>
+            <InputText @bind-Value="User.Password" id="password" placeholder="******" type="password" />
+        </div>
+        <input type="submit" class="btn btn-primary" value="Войти" />
+    </EditForm>
 </section>
 
 @code {
-    private string ErrorText { get; set; }
-    private string Login { get; set; }
-    private string Password { get; set; }
+    private UserLoginModel User { get; set; } = new UserLoginModel();
 
     private void LogIn()
     {
-        ErrorText = null;
-        if (Login == null || Login.Trim().Length == 0)
-            ErrorText = "Требуется ввести логин";
-        else if (!Login.Equals("логин"))
-            ErrorText = "Пользователя с таким логином не существует";
-        else if (Password == null || Password.Trim().Length == 0)
-            ErrorText = "Требуется ввести пароль";
-        else if (!Password.Equals("пароль"))
-            ErrorText = "Неправильный пароль";
+
     }
 }

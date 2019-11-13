@@ -1,10 +1,17 @@
-﻿<Router AppAssembly="@typeof(Program).Assembly">
-    <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
-    </Found>
-    <NotFound>
-        <LayoutView Layout="@typeof(MainLayout)">
-            <p>Звиняйте, но по этому адресу ничего нету.</p>
-        </LayoutView>
-    </NotFound>
-</Router>
+﻿<CascadingAuthenticationState>
+    <Router AppAssembly="@typeof(Program).Assembly">
+        <Found Context="routeData">
+            <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        </Found>
+        <NotFound>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <div class="alert alert-info text-center">
+                    Удивительное дело, но такой страницы ещё (или уже) нет.<br />
+                    Непонятно, каким макаром вы сюда попали, <br />
+                    но точно можно сказать только одно: вам тут делать нечего.<br />
+                    Так что убирайтесь-ка с этой страницы подобру-поздорову.
+                </div>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>

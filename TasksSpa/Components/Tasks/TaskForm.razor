@@ -1,12 +1,25 @@
 ﻿<div class="rowcard card-default w-50 mx-auto col-sm">
     <h4 class="card-header">@Header</h4>
-    <div id="error" class="alert alert-danger" style="display: none"></div>
-    <form>
-        <TextInput @bind-Text="Title" Label="Заголовок:" Placeholder="Заголовок"/>
-        <TextInput @bind-Text="Description" Label="Описание:" Placeholder="Такая-то задача"/>
-        <CheckboxInput />
-        <input type="button" class="btn btn-primary" @onclick="Accept" value="@AcceptBtnText" />
-    </form>
+    <EditForm Model="@taskModel" OnValidSubmit="@Accept">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <label for="title">Заголовок: </label>
+            <InputText @bind-Value="taskModel.Title" id="title" placeholder="Заголовок" />
+        </div>
+        <div class="form-group">
+            <label for="title">Описание: </label>
+            <InputText @bind-Value="taskModel.Description" id="description" placeholder="Такая-то задача" />
+        </div>
+        @if (Task != null)
+        {
+            <div class="form-group">
+                <label for="finished">Задача завершена: </label>
+                <InputCheckbox id="finished" @bind-Value="taskModel.IsFinished" />
+            </div>
+        }
+        <input type="submit" class="btn btn-primary" value="@AcceptBtnText" />
+    </EditForm>
 </div>
 
 @code {
@@ -14,12 +27,28 @@
     public string AcceptBtnText { get; set; }
     [Parameter]
     public string Header { get; set; }
-    
-    private string Description { get; set; }
-    private string Title { get; set; }
+
+    private TaskModel taskModel;
+    [Parameter]
+    public TaskDto Task { get; set; }
+
+    protected override void OnInitialized()
+    {
+        taskModel = new TaskModel();
+        if (Task != null)
+        {
+            taskModel.Title = Task.Title;
+            taskModel.Description = Task.Description;
+            taskModel.IsFinished = Task.IsFinished;
+        }
+    }
 
     private void Accept()
     {
-
+        if (Task == null)
+            Task = new TaskDto();
+        Task.Title = taskModel.Title;
+        Task.Description = taskModel.Description;
+        Task.IsFinished = taskModel.IsFinished;
     }
 }

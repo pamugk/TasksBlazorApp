@@ -1,0 +1,9 @@
+﻿<div class="text-center m-5" style="@SpinnerStyle">
+    <div class="spinner-border"></div>
+</div>
+
+@code {
+    private string SpinnerStyle => Enabled ? "" : "display: none";
+    [Parameter]
+    public bool Enabled { get; set; }
+}

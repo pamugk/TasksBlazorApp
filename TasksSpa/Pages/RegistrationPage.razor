@@ -2,35 +2,30 @@
 
 <section class="card card-default mx-auto w-50 mx-auto">
     <h4 class="card-header">Регистрация</h4>
-    <ErrorMessage @bind-Text="ErrorText" />
-    <form class="card-body">
-        <TextInput Label="Логин:" Placeholder="Логин" @bind-Text="Login" />
-        <PasswordInput Label="Пароль:" @bind-Password="Password" />
-        <PasswordInput Label="Повтор пароля:" @bind-Password="PasswordRepeat" />
-        <input type="button" class="btn btn-primary" @onclick="Registration" value="Зарегистрироваться" />
-    </form>
+    <EditForm Model="@NewUser" OnValidSubmit="@Registration">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <label for="login">Логин: </label>
+            <InputText @bind-Value="NewUser.Login" id="login" placeholder="Логин" />
+        </div>
+        <div class="form-group">
+            <label for="password">Пароль: </label>
+            <InputText @bind-Value="NewUser.Password" id="password" placeholder="******" type="password" />
+        </div>
+        <div class="form-group">
+            <label for="password2">Повтор пароля: </label>
+            <InputText @bind-Value="NewUser.PasswordRepeat" id="password2" placeholder="******" type="password" />
+        </div>
+        <input type="submit" class="btn btn-primary" value="Зарегистрироваться" />
+    </EditForm>
 </section>
 
 @code {
-    private string ErrorText { get; set; }
-    private string Login { get; set; }
-    private string Password { get; set; }
-    private string PasswordRepeat { get; set; }
+    private UserRegistrationModel NewUser { get; set; } = new UserRegistrationModel();
 
     private void Registration()
     {
-        ErrorText = null;
-        if (Login == null)
-            ErrorText = "Требуется ввести логин";
-        else if (!InputValidator.LoginIsValid(Login))
-            ErrorText = "Введённый логин пуст или содержит запрещённые символы";
-        else if (Password == null)
-            ErrorText = "Требуется ввести пароль";
-        else if (!InputValidator.PasswordIsValid(Password))
-            ErrorText = "Введённый пароль пуст или содержит запрещённые символы";
-        else if (PasswordRepeat == null || PasswordRepeat.Trim().Length == 0)
-            ErrorText = "Требуется ввести повтор пароля";
-        else if (!Password.Equals(PasswordRepeat))
-            ErrorText = "Пароли не совпадают";
+
     }
 }

@@ -1,27 +1,38 @@
-﻿@page "/login"
+﻿@page "/tasks"
 @inject HttpClient Http
 
 <div class="container">
     <div class="row">
-        <TaskForm AcceptBtnText="Добавить" Header="Добавление задачи"/>
+        <TaskForm AcceptBtnText="Добавить" @bind-Task="AddedTask" Header="Добавление задачи"/>
         <div class="rowcard card-default w-50 mx-auto col-sm">
             <h1 class="text-center">Список задач</h1>
             <section id="section-container">
                 <FilteringComponent />
-                <div id="loading" class="text-center m-5" style="display: none">
-                    <div class="spinner-border"></div>
-                </div>
-                <TaskList @bind-Tasks="tasks"/>
+                <TaskList @bind-Tasks="Tasks" />
             </section>
         </div>
     </div>
 </div>
 
 @code {
-    private Task[] tasks { get; set; }
+    private TaskDto addedTask;
+    private TaskDto AddedTask
+    {
+        get => addedTask;
+        set
+        {
+            addedTask = value;
+            if (addedTask != null)
+            {
+
+            }
+        }
+    }
+
+    private TaskDto[] Tasks { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        //tasks = await Http.GetJsonAsync<Task[]>("sample-data/tasks.json");
+        Tasks = await Http.GetJsonAsync<TaskDto[]>("https://jsonplaceholder.typicode.com/todos");
     }
 }

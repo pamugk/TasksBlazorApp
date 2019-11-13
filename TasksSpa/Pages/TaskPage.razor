@@ -1,30 +1,21 @@
-﻿<form id="edit-task-form" class="card card-default w-50 mx-auto">
-    <h4 class="card-header">Редактирование задачи</h4>
-    <div id="error" class="alert alert-danger" style="display: none"></div>
-    <div class="form-group">
-        <label for="title-input">Заголовок:</label>
-        <input type="text" name="title" class="form-control" id="title-input" placeholder="Заголовок" value="{{task.title}}">
-    </div>
-    <div class="form-group">
-        <label for="description-input">Описание:</label>
-        <input type="text" name="description" class="form-control" id="description-input" placeholder="Описание" value="{{task.description}}">
-    </div>
-    <div class="form-check">
-        <input type="checkbox" checked={{task.finished}} class="form-check-input" id="finished-input" value="true">
-        <label class="form-check-label" for="chkbox">Завершена</label>
-    </div>
-    <input type="submit" class="btn btn-primary" value="Сохранить" />
-</form>
+﻿@page "/tasks/1"
+@inject HttpClient Http
+
+<TaskForm AcceptBtnText="Сохранить" Header="Редактирование задачи" />
 <div class="card-default w-50 mx-auto">
     <h2 class="text-center">Список комментариев</h2>
-    <section id="section-container">
-        <div id="loading" class="text-center m-5" style="display: none">
-            <div class="spinner-border"></div>
-        </div>
-        <ul id="comments-list" class="list-group"></ul>
+    <section>
+        <CommentList @bind-Comments="Comments"/>
     </section>
 </div>
 
 @code {
+    private CommentDto[] Comments { get; set; }
+    [Parameter]
+    public Task Task { get; set; }
 
+    protected override async Task OnInitializedAsync()
+    {
+        Comments = await Http.GetJsonAsync<CommentDto[]>($"https://jsonplaceholder.typicode.com/comments?postId={Task.Id}");
+    }
 }

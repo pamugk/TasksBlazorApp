@@ -1,17 +1,17 @@
 ﻿@if (Tasks == null)
 {
-    <p><em>Loading...</em></p>
+    <LoadingSpinner Enabled="true"/>
 }
 else
 {
     <ul class="list-group">
         @foreach (var task in Tasks)
         {
-            <TaskItem Task=@task />
+            <TaskItem Task=task />
         }
     </ul>
 }
 
 @code {
-    public Model.Task[] Tasks { get; set; }
+    public TaskDto[] Tasks { get; set; }
 }

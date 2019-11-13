@@ -1,0 +1,19 @@
+﻿<li class="d-flex flex-column list-group-item list-group-item-action">
+    @if (Comment == null)
+    {
+        <p class="text-error">Комментария почему-то нету :(</p>
+    }
+    else
+    {
+        <strong>@Comment.Name</strong><b />
+        <address>
+            <a href="mailto:#">@Comment.Email</a>
+        </address>
+        <span>@Comment.Body</span>
+    }
+</li>
+
+@code {
+    [Parameter]
+    public CommentDto Comment { get; set; }
+}
