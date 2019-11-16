@@ -1,21 +1,44 @@
-﻿@page "/tasks/1"
-@inject HttpClient Http
+﻿@page "/tasks/{Id:int}"
+@inject IdentityAuthStateProvider AuthStateProvider
+@inject ITaskManagerApi TaskManager
+@inject NavigationManager NavigationManager
 
-<TaskForm AcceptBtnText="Сохранить" Header="Редактирование задачи" />
-<div class="card-default w-50 mx-auto">
-    <h2 class="text-center">Список комментариев</h2>
-    <section>
-        <CommentList @bind-Comments="Comments"/>
-    </section>
+<div class="card">
+    <label class="text-center text-danger">@Error</label>
+    <TaskForm AcceptBtnText="Сохранить" Header="Редактирование задачи" @bind-Task="Task" DropOnSave="false" TaskSaved="@UpdateTask" />
+    <div class="card-default w-50 mx-auto">
+        <h2 class="text-center">Список комментариев</h2>
+        <section>
+            <CommentList @bind-Comments="Comments" />
+        </section>
+    </div>
 </div>
 
 @code {
     private CommentDto[] Comments { get; set; }
+    private string Error { get; set; }
     [Parameter]
-    public Task Task { get; set; }
+    public int Id { get; set; }
+    private TaskDto Task { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        Comments = await Http.GetJsonAsync<CommentDto[]>($"https://jsonplaceholder.typicode.com/comments?postId={Task.Id}");
+        Task = await TaskManager.GetTask(Id, AuthStateProvider.Token);
+        Comments = await TaskManager.GetComments(Id);
+    }
+
+    private async Task UpdateTask(TaskDto updatedTask)
+    {
+        Error = null;
+        try
+        {
+            await TaskManager.UpdateTask(updatedTask, AuthStateProvider.Token);
+            NavigationManager.NavigateTo("tasks");
+        }
+        catch (Exception e)
+        {
+            Error = e.Message;
+            StateHasChanged();
+        }
     }
 }

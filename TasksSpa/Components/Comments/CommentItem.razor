@@ -16,4 +16,6 @@
 @code {
     [Parameter]
     public CommentDto Comment { get; set; }
+    [Parameter]
+    public EventCallback<CommentDto> CommentChanged { get; set; }
 }

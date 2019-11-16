@@ -1,38 +1,117 @@
 ﻿@page "/tasks"
-@inject HttpClient Http
+@inject IdentityAuthStateProvider AuthStateProvider
+@inject ITaskManagerApi TaskManager
 
-<div class="container">
-    <div class="row">
-        <TaskForm AcceptBtnText="Добавить" @bind-Task="AddedTask" Header="Добавление задачи"/>
-        <div class="rowcard card-default w-50 mx-auto col-sm">
-            <h1 class="text-center">Список задач</h1>
-            <section id="section-container">
-                <FilteringComponent />
-                <TaskList @bind-Tasks="Tasks" />
-            </section>
+    <div class="container">
+        <label class="text-center text-danger">@Error</label>
+        <div class="row">
+            <TaskForm AcceptBtnText="Добавить" TaskSaved="AddTask" DropOnSave="true" Header="Добавление задачи" />
+            <div class="rowcard card-default w-50 mx-auto col-sm">
+                <h1 class="text-center">Список задач</h1>
+                <section id="section-container">
+                    <FilteringComponent @bind-FilterValue="Filter" OnFilterValChanged="FilterValChanged" OnFilterChanged="FilterChanged" />
+                    <TaskList @bind-Tasks="FilteredTasks" TaskStatusChanged="ChangeTaskStatus" TaskRemoval="RemoveTask" />
+                </section>
+            </div>
         </div>
     </div>
-</div>
 
 @code {
-    private TaskDto addedTask;
-    private TaskDto AddedTask
-    {
-        get => addedTask;
-        set
-        {
-            addedTask = value;
-            if (addedTask != null)
-            {
-
-            }
-        }
-    }
-
-    private TaskDto[] Tasks { get; set; }
+    private string Error { get; set; }
+    private string Filter { get; set; }
+    private TaskDto AddedTask { get; set; }
+    private List<TaskDto> Tasks { get; set; }
+    private List<TaskDto> FilteredTasks { get; set; }
+    public EventCallback<TaskDto> TaskChanged { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        Tasks = await Http.GetJsonAsync<TaskDto[]>("https://jsonplaceholder.typicode.com/todos");
+        try
+        {
+            Tasks = new List<TaskDto>(await TaskManager.GetTasks(AuthStateProvider.Token));
+            FilteredTasks = new List<TaskDto>(Tasks);
+        }
+        catch (Exception e)
+        {
+            Error = e.Message;
+        }
+        StateHasChanged();
+    }
+
+    private async Task AddTask(TaskDto newTask)
+    {
+        try
+        {
+            newTask.Id = await TaskManager.CreateTask(newTask, AuthStateProvider.Token);
+            Tasks.Add(newTask);
+            FilteredTasks = new List<TaskDto>(Tasks);
+            Filter = "";
+        }
+        catch (Exception e)
+        {
+            Error = e.Message;
+        }
+        StateHasChanged();
+    }
+
+    private async Task ChangeTaskStatus(TaskDto changedTask)
+    {
+        try
+        {
+            await TaskManager.ChangeStatus(changedTask, AuthStateProvider.Token);
+            changedTask.IsFinished = !changedTask.IsFinished;
+        }
+        catch (Exception e)
+        {
+            Error = e.Message;
+        }
+        StateHasChanged();
+    }
+
+    private async Task RemoveTask(TaskDto removedTask)
+    {
+        try
+        {
+            await TaskManager.RemoveTask(removedTask.Id, AuthStateProvider.Token);
+            Tasks.Remove(removedTask);
+            FilteredTasks = new List<TaskDto>(Tasks);
+            Filter = "";
+        }
+        catch (Exception e)
+        {
+            Error = e.Message;
+        }
+        StateHasChanged();
+    }
+
+    private void FilterValChanged(string newFilter)
+    {
+        Console.WriteLine(newFilter == null);
+        FilteredTasks = Tasks.Where(task => task.Title.StartsWith(newFilter)).ToList();
+    }
+
+    private void FilterChanged(Filters filter)
+    {
+        Filter = "";
+        Predicate<TaskDto> predicate = null;
+        switch (filter)
+        {
+            case Filters.All:
+                {
+                    predicate = task => true;
+                    break;
+                }
+            case Filters.Finished:
+                {
+                    predicate = task => task.IsFinished;
+                    break;
+                }
+            case Filters.Unfinished:
+                {
+                    predicate = task => !task.IsFinished;
+                    break;
+                }
+        }
+        FilteredTasks = Tasks.Where(task => predicate.Invoke(task)).ToList();
     }
 }

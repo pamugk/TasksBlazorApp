@@ -1,20 +1,28 @@
-﻿namespace TasksSpa.Logic
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace TasksSpa.Logic
 {
-    public class InputValidator
+    public static class InputValidator
     {
-        public bool LoginIsValid(string login)
+        public static ValidationResult LoginIsValid(string login)
         {
-            return login != null && login.Trim().Length > 0 && !login.Contains("@");
+            return login != null && login.Trim().Length > 0 && !login.Contains("@") ? 
+                ValidationResult.Success : 
+                new ValidationResult(null);
         }
 
-        public bool PasswordIsValid(string password)
+        public static ValidationResult PasswordIsValid(string password)
         {
-            return password != null && password.Trim().Length > 0 && !password.Contains("@");
+            return password != null && password.Trim().Length > 0 && !password.Contains("@") ?
+                ValidationResult.Success :
+                new ValidationResult(null);
         }
 
-        public bool TaskTitleIsValid(string title)
+        public static ValidationResult TaskTitleIsValid(string title)
         {
-            return title != null && title.Trim().Length > 0 && !title.Contains("@");
+            return title != null && title.Trim().Length > 0 && !title.Contains("@") ?
+                ValidationResult.Success :
+                new ValidationResult(null);
         }
     }
 }

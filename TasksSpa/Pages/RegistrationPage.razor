@@ -1,8 +1,11 @@
 ﻿@page "/registration"
+@inject NavigationManager NavigationManager
+@inject IdentityAuthStateProvider AuthStateProvider
 
 <section class="card card-default mx-auto w-50 mx-auto">
     <h4 class="card-header">Регистрация</h4>
-    <EditForm Model="@NewUser" OnValidSubmit="@Registration">
+    <label class="text-center text-danger">@Error</label>
+    <EditForm class="card-body" Model="@NewUser" OnValidSubmit="@Registration">
         <DataAnnotationsValidator />
         <ValidationSummary />
         <div class="form-group">
@@ -22,10 +25,21 @@
 </section>
 
 @code {
-    private UserRegistrationModel NewUser { get; set; } = new UserRegistrationModel();
+    private string Error { get; set; }
+    private RegistrationParams NewUser { get; set; } = new RegistrationParams();
 
-    private void Registration()
+    private async void Registration()
     {
-
+        Error = null;
+        try
+        {
+            await AuthStateProvider.Register(NewUser);
+            NavigationManager.NavigateTo("");
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
+            StateHasChanged();
+        }
     }
 }

@@ -5,16 +5,40 @@
     }
     else
     {
-        <input type="checkbox">
-        <a class="ml-auto @TaskStatusClass" href="http://localhost:5000/tasks/{{task.id}}">@Task.Title</a>
-        <button class="btn btn-danger btn-sm btn-remove-todo ml-auto">Удалить</button>
+        @if (Task.IsFinished)
+        {
+            <input type="checkbox" checked />
+        }
+        else
+        {
+            <input type="checkbox" />
+        }
+        <a class="ml-auto @TaskStatusClass" href="tasks/@Task.Id">@Task.Title</a>
+        
+        <button class="btn btn-danger btn-sm btn-remove-todo ml-auto" @onclick="RemoveTask" >Удалить</button>
     }
-    
+
 </li>
 
 @code {
     [Parameter]
     public TaskDto Task { get; set; }
+    [Parameter]
+    public EventCallback<TaskDto> TaskChanged { get; set; }
+    [Parameter]
+    public EventCallback<TaskDto> TaskStatusChanged { get; set; }
+    [Parameter]
+    public EventCallback<TaskDto> TaskRemoval { get; set; }
 
     private string TaskStatusClass => Task.IsFinished ? "completed-task" : null;
+
+    private async Task StatusChanged()
+    {
+        await TaskStatusChanged.InvokeAsync(Task);
+    }
+
+    private async Task RemoveTask()
+    {
+        await TaskRemoval.InvokeAsync(Task);
+    }
 }

@@ -5,9 +5,9 @@
 else
 {
     <ul class="list-group">
-        @foreach (var task in Comments)
+        @foreach (var comment in Comments)
         {
-            <CommentItem Task=task />
+            <CommentItem Comment=comment />
         }
     </ul>
 }
@@ -16,4 +16,6 @@ else
 @code {
     [Parameter]
     public CommentDto[] Comments { get; set; }
+    [Parameter]
+    public EventCallback<CommentDto[]> CommentsChanged { get; set; }
 }

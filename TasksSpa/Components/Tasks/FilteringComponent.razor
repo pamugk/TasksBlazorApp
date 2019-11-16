@@ -1,17 +1,49 @@
 ﻿<div class="d-flex flex-row">
-    <input type="text" class="form-control" placeholder="Фильтр">
+    <input type="text" class="form-control" placeholder="Фильтр" bind-value:event-input="@FilterValue" />
     <div class="dropdown">
-        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            Все
-        </button>
-        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <button class="dropdown-item active">Все</button>
-            <button class="dropdown-item">Завершённые</button>
-            <button class="dropdown-item">Незавершённые</button>
-        </div>
+        <BSDropdown>
+            <BSDropdownToggle Color="Color.Primary">@CurrentFilter</BSDropdownToggle>
+            <BSDropdownMenu>
+                <BSDropdownItem @onclick="async () => await AllFilter() ">Все</BSDropdownItem>
+                <BSDropdownItem @onclick="async () => await FinFilter()">Завершённые</BSDropdownItem>
+                <BSDropdownItem @onclick="async () => await UnfinFilter()">Незавершённые</BSDropdownItem>
+            </BSDropdownMenu>
+        </BSDropdown>
     </div>
 </div>
 
 @code {
+    private string CurrentFilter { get; set; } = "Все";
+    [Parameter]
+    public string FilterValue { get; set; } = "";
+    [Parameter]
+    public EventCallback<string> FilterValueChanged { get; set; }
+    [Parameter]
+    public EventCallback<string> OnFilterValChanged { get; set; }
+    [Parameter]
+    public EventCallback<Filters> OnFilterChanged { get; set; }
 
+    private async Task FilterChanged(string newInput)
+    {
+        await OnFilterValChanged.InvokeAsync(newInput);
+    }
+
+    private async Task AllFilter()
+    {
+        CurrentFilter = "Все";
+        await OnFilterChanged.InvokeAsync(Filters.All);
+    }
+
+    private async Task FinFilter()
+    {
+        CurrentFilter = "Завершённые";
+        await OnFilterChanged.InvokeAsync(Filters.Finished);
+    }
+
+    
+    private async Task UnfinFilter()
+    {
+        CurrentFilter = "Незавершённые";
+        await OnFilterChanged.InvokeAsync(Filters.Unfinished);
+    }
 }

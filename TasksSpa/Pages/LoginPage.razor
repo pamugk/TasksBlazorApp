@@ -1,8 +1,13 @@
 ﻿@page "/login"
+@inject NavigationManager NavigationManager
+@inject IdentityAuthStateProvider AuthStateProvider
 
 <section class="card card-default w-50 mx-auto">
     <h4 class="card-header">Вход</h4>
-    <EditForm Model="@User" OnValidSubmit="@LogIn">
+    <label class="text-center text-danger">@Error</label>
+    <EditForm class="card-body" Model="@User" OnValidSubmit="@LogIn">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
         <div class="form-group">
             <label for="login">Логин: </label>
             <InputText @bind-Value="User.Login" id="login" placeholder="Логин" />
@@ -16,10 +21,21 @@
 </section>
 
 @code {
-    private UserLoginModel User { get; set; } = new UserLoginModel();
+    private string Error { get; set; }
+    private LoginParams User { get; set; } = new LoginParams();
 
-    private void LogIn()
+    private async void LogIn()
     {
-
+        Error = null;
+        try
+        {
+            await AuthStateProvider.Login(User);
+            NavigationManager.NavigateTo("");
+        }
+        catch (Exception ex)
+        {
+            Error = ex.Message;
+            StateHasChanged();
+        }
     }
 }

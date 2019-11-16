@@ -2,9 +2,13 @@
     <a class="navbar-brand" href="">TasksSpa</a>
 
     <ul class="navbar-nav mr-auto">
-        <NavItem Classes="oi oi-home" Link="" Match="NavLinkMatch.All" Text="Главная"/>
-        <NavItem Classes="oi oi-list-rich" Link="tasks" Text="Задачи"/>
-        <NavItem Classes="oi oi-info" Link="about" Text="О сайте"/>
+        <NavItem Classes="oi oi-home" Link="" Match="NavLinkMatch.All" Text="Главная" />
+        <AuthorizeView>
+            <Authorized>
+                <NavItem Classes="oi oi-list-rich" Link="tasks" Text="Задачи" />
+            </Authorized>
+        </AuthorizeView>
+        <NavItem Classes="oi oi-info" Link="about" Text="О сайте" />
     </ul>
 
     <ul class="navbar-nav ml-auto">

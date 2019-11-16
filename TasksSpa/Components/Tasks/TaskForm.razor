@@ -1,4 +1,4 @@
-﻿<div class="rowcard card-default w-50 mx-auto col-sm">
+﻿<div class="rowcard card card-default w-50 mx-auto col-sm">
     <h4 class="card-header">@Header</h4>
     <EditForm Model="@taskModel" OnValidSubmit="@Accept">
         <DataAnnotationsValidator />
@@ -28,27 +28,45 @@
     [Parameter]
     public string Header { get; set; }
 
-    private TaskModel taskModel;
+    private TaskModel taskModel { get; set; } = new TaskModel();
+    private TaskDto task;
     [Parameter]
-    public TaskDto Task { get; set; }
-
-    protected override void OnInitialized()
+    public TaskDto Task
     {
-        taskModel = new TaskModel();
-        if (Task != null)
+        get => task;
+        set
         {
-            taskModel.Title = Task.Title;
-            taskModel.Description = Task.Description;
-            taskModel.IsFinished = Task.IsFinished;
+            task = value;
+            taskModel = new TaskModel();
+            if (value != null)
+            {
+                taskModel.Title = Task.Title;
+                taskModel.Description = Task.Description;
+                taskModel.IsFinished = Task.IsFinished;
+                StateHasChanged();
+            }
         }
     }
+    [Parameter]
+    public EventCallback<TaskDto> TaskChanged { get; set; }
+    [Parameter]
+    public EventCallback<TaskDto> TaskSaved { get; set; }
+    [Parameter]
+    public bool DropOnSave { get; set; }
 
-    private void Accept()
+    private async Task Accept()
     {
-        if (Task == null)
-            Task = new TaskDto();
-        Task.Title = taskModel.Title;
-        Task.Description = taskModel.Description;
-        Task.IsFinished = taskModel.IsFinished;
+        TaskDto tmpTask = Task == null ? new TaskDto() : Task;
+        if (task != null)
+        {
+            tmpTask.Id = task.Id;
+            tmpTask.UserId = task.UserId;
+        }
+        tmpTask.Title = taskModel.Title;
+        tmpTask.Description = taskModel.Description;
+        tmpTask.IsFinished = taskModel.IsFinished;
+        await TaskSaved.InvokeAsync(tmpTask);
+        if (DropOnSave)
+            Task = null;
     }
 }

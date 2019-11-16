@@ -7,11 +7,18 @@ else
     <ul class="list-group">
         @foreach (var task in Tasks)
         {
-            <TaskItem Task=task />
+            <TaskItem Task=task TaskStatusChanged="TaskStatusChanged" TaskRemoval="TaskRemoval"/>
         }
     </ul>
 }
 
 @code {
-    public TaskDto[] Tasks { get; set; }
+    [Parameter]
+    public List<TaskDto> Tasks { get; set; }
+    [Parameter]
+    public EventCallback<List<TaskDto>> TasksChanged { get; set; }
+    [Parameter]
+    public EventCallback<TaskDto> TaskStatusChanged { get; set; }
+    [Parameter]
+    public EventCallback<TaskDto> TaskRemoval { get; set; }
 }
