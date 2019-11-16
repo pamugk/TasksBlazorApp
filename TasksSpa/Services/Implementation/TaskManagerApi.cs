@@ -14,6 +14,7 @@ namespace TasksSpa.Services.Implementation
     {
         private readonly HttpClient httpClient;
         private const string server = "https://todos-rest-api-server.herokuapp.com";
+        //private const string server = "http://localhost:5000";
 
         public TaskManagerApi(HttpClient httpClient)
         {
@@ -60,6 +61,7 @@ namespace TasksSpa.Services.Implementation
 
         public async Task<TaskDto[]> GetTasks(string token)
         {
+            Console.WriteLine("qq");
             var response = await httpClient.GetAsync($"{server}/api/tasks?token={WebUtility.UrlEncode(token)}");
             var body = await response.Content.ReadAsStringAsync();
             if (response.IsSuccessStatusCode)
@@ -78,7 +80,8 @@ namespace TasksSpa.Services.Implementation
         public async Task UpdateTask(TaskDto updatedTask, string token)
         {
             var stringContent = new StringContent(JsonSerializer.Serialize(updatedTask), Encoding.UTF8, "application/json");
-            var response = await httpClient.PutAsync($"{server}/api/tasks/add?token={WebUtility.UrlEncode(token)}", stringContent);
+            Console.WriteLine(JsonSerializer.Serialize(updatedTask));
+            var response = await httpClient.PutAsync($"{server}/api/tasks/{updatedTask.Id}?token={WebUtility.UrlEncode(token)}", stringContent);
             var body = await response.Content.ReadAsStringAsync();
             if (!response.IsSuccessStatusCode)
                 throw new Exception(body);

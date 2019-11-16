@@ -5,14 +5,7 @@
     }
     else
     {
-        @if (Task.IsFinished)
-        {
-            <input type="checkbox" checked />
-        }
-        else
-        {
-            <input type="checkbox" />
-        }
+        <input @bind="Task.IsFinished" type="checkbox" />
         <a class="ml-auto @TaskStatusClass" href="tasks/@Task.Id">@Task.Title</a>
         
         <button class="btn btn-danger btn-sm btn-remove-todo ml-auto" @onclick="RemoveTask" >Удалить</button>
@@ -25,6 +18,14 @@
     public TaskDto Task { get; set; }
     [Parameter]
     public EventCallback<TaskDto> TaskChanged { get; set; }
+    private bool TaskState
+    {
+        get => Task.IsFinished;
+        set
+        {
+            ChangeStatus();
+        }
+    }
     [Parameter]
     public EventCallback<TaskDto> TaskStatusChanged { get; set; }
     [Parameter]
@@ -32,7 +33,7 @@
 
     private string TaskStatusClass => Task.IsFinished ? "completed-task" : null;
 
-    private async Task StatusChanged()
+    private async Task ChangeStatus()
     {
         await TaskStatusChanged.InvokeAsync(Task);
     }

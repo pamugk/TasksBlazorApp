@@ -1,12 +1,12 @@
 ﻿<div class="d-flex flex-row">
-    <input type="text" class="form-control" placeholder="Фильтр" bind-value:event-input="@FilterValue" />
+    <input type="text" class="form-control" @bind-value="FilterValue"  @bind-value:event="oninput" placeholder="Фильтр" />
     <div class="dropdown">
         <BSDropdown>
             <BSDropdownToggle Color="Color.Primary">@CurrentFilter</BSDropdownToggle>
             <BSDropdownMenu>
-                <BSDropdownItem @onclick="async () => await AllFilter() ">Все</BSDropdownItem>
-                <BSDropdownItem @onclick="async () => await FinFilter()">Завершённые</BSDropdownItem>
-                <BSDropdownItem @onclick="async () => await UnfinFilter()">Незавершённые</BSDropdownItem>
+                <BSDropdownItem @onclick="AllFilter ">Все</BSDropdownItem>
+                <BSDropdownItem @onclick="FinFilter">Завершённые</BSDropdownItem>
+                <BSDropdownItem @onclick="UnfinFilter">Незавершённые</BSDropdownItem>
             </BSDropdownMenu>
         </BSDropdown>
     </div>
@@ -14,36 +14,49 @@
 
 @code {
     private string CurrentFilter { get; set; } = "Все";
+    private Filters curFilter = Filters.All;
+    private string filterValue = "";
     [Parameter]
-    public string FilterValue { get; set; } = "";
+    public string FilterValue
+    {
+        get => filterValue;
+        set
+        {
+            filterValue = value;
+            DoFilter();
+        }
+    }
     [Parameter]
     public EventCallback<string> FilterValueChanged { get; set; }
     [Parameter]
-    public EventCallback<string> OnFilterValChanged { get; set; }
-    [Parameter]
-    public EventCallback<Filters> OnFilterChanged { get; set; }
+    public Action<string, Filters> OnFilterChanged { get; set; }
 
-    private async Task FilterChanged(string newInput)
+    protected override void OnInitialized()
     {
-        await OnFilterValChanged.InvokeAsync(newInput);
+        FilterValue = "";
     }
 
-    private async Task AllFilter()
+    private void DoFilter() => OnFilterChanged?.Invoke(filterValue == null ? "" : filterValue, curFilter);
+
+    private void AllFilter()
     {
         CurrentFilter = "Все";
-        await OnFilterChanged.InvokeAsync(Filters.All);
+        curFilter = Filters.All;
+        DoFilter();
     }
 
-    private async Task FinFilter()
+    private void FinFilter()
     {
         CurrentFilter = "Завершённые";
-        await OnFilterChanged.InvokeAsync(Filters.Finished);
+        curFilter = Filters.Finished;
+        DoFilter();
     }
 
-    
-    private async Task UnfinFilter()
+
+    private void UnfinFilter()
     {
         CurrentFilter = "Незавершённые";
-        await OnFilterChanged.InvokeAsync(Filters.Unfinished);
+        curFilter = Filters.Unfinished;
+        DoFilter();
     }
 }

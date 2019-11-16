@@ -9,7 +9,7 @@
             <div class="rowcard card-default w-50 mx-auto col-sm">
                 <h1 class="text-center">Список задач</h1>
                 <section id="section-container">
-                    <FilteringComponent @bind-FilterValue="Filter" OnFilterValChanged="FilterValChanged" OnFilterChanged="FilterChanged" />
+                    <FilteringComponent OnFilterChanged="FilterChanged" />
                     <TaskList @bind-Tasks="FilteredTasks" TaskStatusChanged="ChangeTaskStatus" TaskRemoval="RemoveTask" />
                 </section>
             </div>
@@ -18,7 +18,6 @@
 
 @code {
     private string Error { get; set; }
-    private string Filter { get; set; }
     private TaskDto AddedTask { get; set; }
     private List<TaskDto> Tasks { get; set; }
     private List<TaskDto> FilteredTasks { get; set; }
@@ -44,8 +43,6 @@
         {
             newTask.Id = await TaskManager.CreateTask(newTask, AuthStateProvider.Token);
             Tasks.Add(newTask);
-            FilteredTasks = new List<TaskDto>(Tasks);
-            Filter = "";
         }
         catch (Exception e)
         {
@@ -74,8 +71,6 @@
         {
             await TaskManager.RemoveTask(removedTask.Id, AuthStateProvider.Token);
             Tasks.Remove(removedTask);
-            FilteredTasks = new List<TaskDto>(Tasks);
-            Filter = "";
         }
         catch (Exception e)
         {
@@ -84,34 +79,30 @@
         StateHasChanged();
     }
 
-    private void FilterValChanged(string newFilter)
+    private void FilterChanged(string filterText, Filters filter)
     {
-        Console.WriteLine(newFilter == null);
-        FilteredTasks = Tasks.Where(task => task.Title.StartsWith(newFilter)).ToList();
-    }
-
-    private void FilterChanged(Filters filter)
-    {
-        Filter = "";
+        if (Tasks == null)
+            return;
         Predicate<TaskDto> predicate = null;
         switch (filter)
         {
             case Filters.All:
                 {
-                    predicate = task => true;
+                    predicate = task => task.Title.StartsWith(filterText);
                     break;
                 }
             case Filters.Finished:
                 {
-                    predicate = task => task.IsFinished;
+                    predicate = task => task.IsFinished && task.Title.StartsWith(filterText);
                     break;
                 }
             case Filters.Unfinished:
                 {
-                    predicate = task => !task.IsFinished;
+                    predicate = task => !task.IsFinished && task.Title.StartsWith(filterText);
                     break;
                 }
         }
         FilteredTasks = Tasks.Where(task => predicate.Invoke(task)).ToList();
+        StateHasChanged();
     }
 }
