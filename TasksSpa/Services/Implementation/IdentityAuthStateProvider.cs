@@ -1,7 +1,6 @@
 ﻿using Blazor.Extensions.Storage;
 using Microsoft.AspNetCore.Components.Authorization;
 using System;
-using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using TasksSpa.Model;
@@ -23,30 +22,58 @@ namespace TasksSpa.Services.Implementation
 
         public async Task Login(LoginParams loginParameters)
         {
-            await localStorage.SetItem("token", await authorizationApi.Login(loginParameters));
+            try
+            {
+                await localStorage.SetItem("token", await authorizationApi.Login(loginParameters));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
             NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
         }
 
         public async Task Register(RegistrationParams registerParameters)
         {
-            await authorizationApi.Register(registerParameters);
+            try
+            {
+                await authorizationApi.Register(registerParameters);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
             NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
         }
 
         public async Task Logout()
         {
-            await authorizationApi.Logout();
-            userInfoCache = null;
-            await localStorage.RemoveItem("token");
+            try
+            {
+                await authorizationApi.Logout();
+                userInfoCache = null;
+                await localStorage.RemoveItem("token");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
             NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
         }
 
         private async Task<UserDto> GetUserInfo()
         {
             if (userInfoCache != null && userInfoCache.IsAuthenticated) return userInfoCache;
-            userInfoCache = await 
+            try
+            {
+                userInfoCache = await
                 authorizationApi
                 .GetUserInfo(await localStorage.GetItem<string>("token"));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
             return userInfoCache;
         }
 
@@ -60,7 +87,7 @@ namespace TasksSpa.Services.Implementation
                     identity = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, userInfoCache.Login) },
                         "Token server authentication");
             }
-            catch (HttpRequestException ex)
+            catch (Exception ex)
             {
                 Console.WriteLine("Request failed:" + ex.ToString());
             }
