@@ -38,7 +38,6 @@
         catch (NotFoundException)
         {
             Error = "Задача не найдена";
-            NavigationManager.NavigateTo("tasks");
         }
         catch (NotAuthenticatedException)
         {
@@ -46,7 +45,7 @@
         }
         catch (Exception e)
         {
-            Error = "Произошла какая-то неведомая ерунда";
+            Error = "Похоже, нет соединения с сервером";
             Console.WriteLine(e.Message);
         }
     }
@@ -78,7 +77,7 @@
         }
         catch (Exception e)
         {
-            Error = "Произошла какая-то неведомая ерунда";
+            Error = "Похоже, нет соединения с сервером";
             Console.WriteLine(e.Message);
         }
         StateHasChanged();

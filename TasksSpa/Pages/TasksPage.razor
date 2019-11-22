@@ -86,6 +86,8 @@
         {
             Error = "Странно, но задача на изменение не была найдена. Видать, пора её убрать";
             Tasks.Remove(changedTask);
+            if (currentFilter.Invoke(changedTask))
+                FilteredTasks.Remove(changedTask);
         }
         catch (NotAcceptableException)
         {
@@ -97,7 +99,7 @@
         }
         catch (Exception e)
         {
-            Error = "Произошла какая-то неведомая ерунда";
+            Error = "Похоже, нет соединения с сервером";
             Console.WriteLine(e.Message);
         }
         StateHasChanged();
@@ -109,6 +111,8 @@
         {
             await TaskManager.RemoveTask(removedTask.Id, await AuthStateProvider.GetToken());
             Tasks.Remove(removedTask);
+            if (currentFilter.Invoke(removedTask))
+                FilteredTasks.Remove(removedTask);
         }
         catch (NotAuthorizedException)
         {
@@ -122,10 +126,12 @@
         {
             Error = "Странно, но задача на удаление не была найдена. Видать, пора её убрать";
             Tasks.Remove(removedTask);
+            if (currentFilter.Invoke(removedTask))
+                FilteredTasks.Remove(removedTask);
         }
         catch (Exception e)
         {
-            Error = "Произошла какая-то неведомая ерунда";
+            Error = "Похоже, нет соединения с сервером";
             Console.WriteLine(e.Message);
         }
         StateHasChanged();

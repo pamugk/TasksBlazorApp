@@ -1,5 +1,4 @@
 using Blazor.Extensions.Storage;
-using Microsoft.AspNetCore.Blazor.Http;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,7 +21,6 @@ namespace TasksSpa
 
         public void Configure(IComponentsApplicationBuilder app)
         {
-            WebAssemblyHttpMessageHandler.DefaultCredentials = FetchCredentialsOption.Include;
             app.AddComponent<App>("app");
         }
     }
