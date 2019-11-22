@@ -21,6 +21,9 @@
                 <NavItem Classes="oi oi-account-login" Link="login" Text="Вход" />
                 <NavItem Classes="oi oi-plus" Link="registration" Text="Регистрация" />
             </NotAuthorized>
+            <Authorizing>
+                <LoadingSpinner/>
+            </Authorizing>
         </AuthorizeView>
     </ul>
 </nav>

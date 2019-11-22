@@ -11,32 +11,41 @@
     </Authorized>
     <NotAuthorized>
         <section class="card card-default w-50 mx-auto">
-            <h4 class="card-header">Вход</h4>
-            <label class="text-center text-danger">@Error</label>
-            <EditForm Context="LoginFormContext" class="card-body" Model="@User" OnValidSubmit="@LogIn">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
-                <div class="form-group">
-                    <label for="login">Логин: </label>
-                    <InputText @bind-Value="User.Login" id="login" placeholder="Логин" />
-                </div>
-                <div class="form-group">
-                    <label for="password">Пароль: </label>
-                    <InputText @bind-Value="User.Password" id="password" placeholder="******" type="password" />
-                </div>
-                <input type="submit" class="btn btn-primary" value="Войти" />
-            </EditForm>
+            @if (ProcessingQuery)
+            {
+                <StandbyMessage />
+            }
+            else
+            {
+                <h4 class="card-header">Вход</h4>
+                <label class="text-center text-danger">@Error</label>
+                <EditForm Context="LoginFormContext" class="card-body" Model="@User" OnValidSubmit="@LogIn">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+                    <div class="form-group">
+                        <label for="login">Логин: </label>
+                        <InputText @bind-Value="User.Login" id="login" placeholder="Логин" />
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Пароль: </label>
+                        <InputText @bind-Value="User.Password" id="password" placeholder="******" type="password" />
+                    </div>
+                    <input type="submit" class="btn btn-primary" value="Войти" />
+                </EditForm>
+            }
         </section>
     </NotAuthorized>
 </AuthorizeView>
 
 @code {
     private string Error { get; set; }
+    private bool ProcessingQuery { get; set; }
     private LoginParams User { get; set; } = new LoginParams();
 
     private async void LogIn()
     {
         Error = null;
+        ProcessingQuery = true;
         try
         {
             await AuthStateProvider.Login(User);
@@ -51,6 +60,7 @@
             Error = "Произошла какая-то неведомая ерунда";
             Console.WriteLine(ex.Message);
         }
+        ProcessingQuery = false;
         StateHasChanged();
     }
 }
