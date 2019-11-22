@@ -1,3 +1,4 @@
+using Blazor.Extensions.Storage;
 using Microsoft.AspNetCore.Blazor.Http;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Builder;
@@ -12,6 +13,7 @@ namespace TasksSpa
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddAuthorizationCore();
+            services.AddStorage();
             services.AddScoped<IdentityAuthStateProvider>();
             services.AddScoped<AuthenticationStateProvider>(s => s.GetRequiredService<IdentityAuthStateProvider>());
             services.AddScoped<IAuthorizationApi, AuthorizationApi>();
@@ -20,7 +22,7 @@ namespace TasksSpa
 
         public void Configure(IComponentsApplicationBuilder app)
         {
-            //WebAssemblyHttpMessageHandler.DefaultCredentials = FetchCredentialsOption.Include;
+            WebAssemblyHttpMessageHandler.DefaultCredentials = FetchCredentialsOption.Include;
             app.AddComponent<App>("app");
         }
     }

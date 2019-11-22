@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components.Authorization;
+﻿using Blazor.Extensions.Storage;
+using Microsoft.AspNetCore.Components.Authorization;
 using System;
 using System.Net.Http;
 using System.Security.Claims;
@@ -10,18 +11,19 @@ namespace TasksSpa.Services.Implementation
 {
     public class IdentityAuthStateProvider : AuthenticationStateProvider
     {
-        private UserDto userInfoCache;
-        public string Token { get; private set; }
         private readonly IAuthorizationApi authorizationApi;
+        private readonly LocalStorage localStorage;
+        private UserDto userInfoCache;
 
-        public IdentityAuthStateProvider(IAuthorizationApi authorizationApi)
+        public IdentityAuthStateProvider(IAuthorizationApi authorizationApi, LocalStorage localStorage)
         {
             this.authorizationApi = authorizationApi;
+            this.localStorage = localStorage;
         }
 
         public async Task Login(LoginParams loginParameters)
         {
-            Token = await authorizationApi.Login(loginParameters);
+            await localStorage.SetItem("token", await authorizationApi.Login(loginParameters));
             NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
         }
 
@@ -35,14 +37,16 @@ namespace TasksSpa.Services.Implementation
         {
             await authorizationApi.Logout();
             userInfoCache = null;
-            Token = null;
+            await localStorage.RemoveItem("token");
             NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
         }
 
         private async Task<UserDto> GetUserInfo()
         {
             if (userInfoCache != null && userInfoCache.IsAuthenticated) return userInfoCache;
-            userInfoCache = await authorizationApi.GetUserInfo(Token);
+            userInfoCache = await 
+                authorizationApi
+                .GetUserInfo(await localStorage.GetItem<string>("token"));
             return userInfoCache;
         }
 
@@ -63,5 +67,7 @@ namespace TasksSpa.Services.Implementation
 
             return new AuthenticationState(new ClaimsPrincipal(identity));
         }
+
+        public async Task<string> GetToken() => await localStorage.GetItem<string>("token");
     }
 }

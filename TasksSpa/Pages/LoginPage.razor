@@ -2,23 +2,33 @@
 @inject NavigationManager NavigationManager
 @inject IdentityAuthStateProvider AuthStateProvider
 
-<section class="card card-default w-50 mx-auto">
-    <h4 class="card-header">Вход</h4>
-    <label class="text-center text-danger">@Error</label>
-    <EditForm class="card-body" Model="@User" OnValidSubmit="@LogIn">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-        <div class="form-group">
-            <label for="login">Логин: </label>
-            <InputText @bind-Value="User.Login" id="login" placeholder="Логин" />
+<AuthorizeView>
+    <Authorized>
+        <div class="alert alert-info text-center">
+            Знаете, конечно, похвально, что вы хотите регаться снова и снова и снова, но блин...<br />
+            Хотя бы для приличия разлогиньтесь, что ли.
         </div>
-        <div class="form-group">
-            <label for="password">Пароль: </label>
-            <InputText @bind-Value="User.Password" id="password" placeholder="******" type="password" />
-        </div>
-        <input type="submit" class="btn btn-primary" value="Войти" />
-    </EditForm>
-</section>
+    </Authorized>
+    <NotAuthorized>
+        <section class="card card-default w-50 mx-auto">
+            <h4 class="card-header">Вход</h4>
+            <label class="text-center text-danger">@Error</label>
+            <EditForm Context="LoginFormContext" class="card-body" Model="@User" OnValidSubmit="@LogIn">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <div class="form-group">
+                    <label for="login">Логин: </label>
+                    <InputText @bind-Value="User.Login" id="login" placeholder="Логин" />
+                </div>
+                <div class="form-group">
+                    <label for="password">Пароль: </label>
+                    <InputText @bind-Value="User.Password" id="password" placeholder="******" type="password" />
+                </div>
+                <input type="submit" class="btn btn-primary" value="Войти" />
+            </EditForm>
+        </section>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
     private string Error { get; set; }
@@ -32,10 +42,15 @@
             await AuthStateProvider.Login(User);
             NavigationManager.NavigateTo("");
         }
+        catch (NotAuthenticatedException)
+        {
+            Error = "Неверные имя пользователя или пароль";
+        }
         catch (Exception ex)
         {
-            Error = ex.Message;
-            StateHasChanged();
+            Error = "Произошла какая-то неведомая ерунда";
+            Console.WriteLine(ex.Message);
         }
+        StateHasChanged();
     }
 }

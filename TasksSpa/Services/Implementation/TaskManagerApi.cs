@@ -7,14 +7,15 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using TasksSpa.Model;
 using TasksSpa.Services.Contracts;
+using TasksSpa.Services.Exceptions;
 
 namespace TasksSpa.Services.Implementation
 {
     public class TaskManagerApi : ITaskManagerApi
     {
         private readonly HttpClient httpClient;
-        private const string server = "https://todos-rest-api-server.herokuapp.com";
-        //private const string server = "http://localhost:5000";
+        //private const string server = "https://todos-rest-api-server.herokuapp.com";
+        private const string server = "http://localhost:5000";
 
         public TaskManagerApi(HttpClient httpClient)
         {
@@ -39,8 +40,15 @@ namespace TasksSpa.Services.Implementation
             var stringContent = new StringContent(JsonSerializer.Serialize(newTask), Encoding.UTF8, "application/json");
             var response = await httpClient.PostAsync($"{server}/api/tasks?token={WebUtility.UrlEncode(token)}", stringContent);
             var body = await response.Content.ReadAsStringAsync();
-            if (!response.IsSuccessStatusCode)
-                throw new Exception(body);
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.Created:
+                    break;
+                case HttpStatusCode.NotAcceptable:
+                    throw new NotAcceptableException(body);
+                case HttpStatusCode.Unauthorized:
+                    throw new NotAuthenticatedException(body);
+            }
             return JsonSerializer.Deserialize<int>(body);
         }
 
@@ -54,27 +62,49 @@ namespace TasksSpa.Services.Implementation
         {
             var response = await httpClient.GetAsync($"{server}/api/tasks/{taskId}?token={WebUtility.UrlEncode(token)}");
             var body = await response.Content.ReadAsStringAsync();
-            if (response.IsSuccessStatusCode)
-                return JsonSerializer.Deserialize<TaskDto>(body);
-            else throw new Exception(body);
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.Forbidden:
+                    throw new NotAuthorizedException(body);
+                case HttpStatusCode.NotFound:
+                    throw new NotFoundException(body);
+                case HttpStatusCode.OK:
+                    break;
+                case HttpStatusCode.Unauthorized:
+                    throw new NotAuthenticatedException(body);
+            }
+            return JsonSerializer.Deserialize<TaskDto>(body);
         }
 
         public async Task<TaskDto[]> GetTasks(string token)
         {
-            Console.WriteLine("qq");
             var response = await httpClient.GetAsync($"{server}/api/tasks?token={WebUtility.UrlEncode(token)}");
             var body = await response.Content.ReadAsStringAsync();
-            if (response.IsSuccessStatusCode)
-                return JsonSerializer.Deserialize<TaskDto[]>(body);
-            else throw new Exception(body);
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.OK:
+                    break;
+                case HttpStatusCode.Unauthorized:
+                    throw new NotAuthenticatedException(body);
+            }
+            return JsonSerializer.Deserialize<TaskDto[]>(body);
         }
 
         public async Task RemoveTask(int taskId, string token)
         {
             var response = await httpClient.DeleteAsync($"{server}/api/tasks/{taskId}?token={WebUtility.UrlEncode(token)}");
             var body = await response.Content.ReadAsStringAsync();
-            if (!response.IsSuccessStatusCode)
-                throw new Exception(body);
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.Forbidden:
+                    throw new NotAuthorizedException(body);
+                case HttpStatusCode.NotFound:
+                    throw new NotFoundException(body);
+                case HttpStatusCode.OK:
+                    break;
+                case HttpStatusCode.Unauthorized:
+                    throw new NotAuthenticatedException(body);
+            }
         }
 
         public async Task UpdateTask(TaskDto updatedTask, string token)
@@ -83,8 +113,19 @@ namespace TasksSpa.Services.Implementation
             Console.WriteLine(JsonSerializer.Serialize(updatedTask));
             var response = await httpClient.PutAsync($"{server}/api/tasks/{updatedTask.Id}?token={WebUtility.UrlEncode(token)}", stringContent);
             var body = await response.Content.ReadAsStringAsync();
-            if (!response.IsSuccessStatusCode)
-                throw new Exception(body);
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.Forbidden:
+                    throw new NotAuthorizedException(body);
+                case HttpStatusCode.NotFound:
+                    throw new NotFoundException(body);
+                case HttpStatusCode.OK:
+                    break;
+                case HttpStatusCode.NotAcceptable:
+                    throw new NotAcceptableException(body);
+                case HttpStatusCode.Unauthorized:
+                    throw new NotAuthenticatedException(body);
+            }
         }
     }
 }

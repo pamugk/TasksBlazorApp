@@ -1,4 +1,6 @@
 ﻿@page "/tasks/{Id:int}"
+@attribute [Authorize]
+
 @inject IdentityAuthStateProvider AuthStateProvider
 @inject ITaskManagerApi TaskManager
 @inject NavigationManager NavigationManager
@@ -23,8 +25,30 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Task = await TaskManager.GetTask(Id, AuthStateProvider.Token);
-        Comments = await TaskManager.GetComments(Id);
+        Error = null;
+        try
+        {
+            Task = await TaskManager.GetTask(Id, await AuthStateProvider.GetToken());
+            Comments = await TaskManager.GetComments(Id);
+        }
+        catch (NotAuthorizedException)
+        {
+            Error = "У вас нет прав на получение этой задачи";
+        }
+        catch (NotFoundException)
+        {
+            Error = "Задача не найдена";
+            NavigationManager.NavigateTo("tasks");
+        }
+        catch (NotAuthenticatedException)
+        {
+            Error = "Только пользователи могут получать свои задачи";
+        }
+        catch (Exception e)
+        {
+            Error = "Произошла какая-то неведомая ерунда";
+            Console.WriteLine(e.Message);
+        }
     }
 
     private async Task UpdateTask(TaskDto updatedTask)
@@ -32,13 +56,31 @@
         Error = null;
         try
         {
-            await TaskManager.UpdateTask(updatedTask, AuthStateProvider.Token);
+            await TaskManager.UpdateTask(updatedTask, await AuthStateProvider.GetToken());
             NavigationManager.NavigateTo("tasks");
+        }
+        catch (NotAuthorizedException)
+        {
+            Error = "Ай-ай-ай, нехорошо изменить статус чужой задачи";
+        }
+        catch (NotFoundException)
+        {
+            Error = "Странно, но задача на изменение не была найдена. Видать, тут больше делать нечего";
+            NavigationManager.NavigateTo("tasks");
+        }
+        catch (NotAcceptableException)
+        {
+            Error = "Только пользователи могут добавлять задачи";
+        }
+        catch (NotAuthenticatedException)
+        {
+            Error = "Только пользователи могут изменять статус задач";
         }
         catch (Exception e)
         {
-            Error = e.Message;
-            StateHasChanged();
+            Error = "Произошла какая-то неведомая ерунда";
+            Console.WriteLine(e.Message);
         }
+        StateHasChanged();
     }
 }

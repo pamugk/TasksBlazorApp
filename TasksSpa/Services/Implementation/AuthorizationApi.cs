@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Components;
-using System;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -7,14 +6,15 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using TasksSpa.Model;
 using TasksSpa.Services.Contracts;
+using TasksSpa.Services.Exceptions;
 
 namespace TasksSpa.Services.Implementation
 {
     public class AuthorizationApi : IAuthorizationApi
     {
         private readonly HttpClient httpClient;
-        private const string server = "https://todos-rest-api-server.herokuapp.com";
-        //private const string server = "http://localhost:5000";
+        //private const string server = "https://todos-rest-api-server.herokuapp.com";
+        private const string server = "http://localhost:5000";
 
         public AuthorizationApi(HttpClient httpClient)
         {
@@ -31,7 +31,7 @@ namespace TasksSpa.Services.Implementation
             var stringContent = new StringContent(JsonSerializer.Serialize(loginParameters), Encoding.UTF8, "application/json");
             var response = await httpClient.PostAsync($"{server}/api/login", stringContent);
             var body = await response.Content.ReadAsStringAsync();
-            if (!response.IsSuccessStatusCode) throw new Exception(body);
+            if (!response.IsSuccessStatusCode) throw new NotAuthenticatedException(body);
             return body;
         }
 
@@ -45,7 +45,7 @@ namespace TasksSpa.Services.Implementation
             var stringContent = new StringContent(JsonSerializer.Serialize(registerParameters), Encoding.UTF8, "application/json");
             var response = await httpClient.PostAsync($"{server}/api/registration", stringContent);
             var body = await response.Content.ReadAsStringAsync();
-            if (!response.IsSuccessStatusCode) throw new Exception(body);
+            if (!response.IsSuccessStatusCode) throw new RegistrationException(body);
         }
     }
 }

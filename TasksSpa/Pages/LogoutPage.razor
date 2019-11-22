@@ -2,10 +2,31 @@
 @inject NavigationManager NavigationManager
 @inject IdentityAuthStateProvider AuthStateProvider
 
+<AuthorizeView>
+    <Authorized>
+        <div class="alert alert-success text-center">
+            Вас успешно разлогинивают. Подождите немного, скоро всё закончится.
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <div class="alert alert-warning text-center">
+            Хм, так вы же не были залогинены.<br/>
+            Знаете, на этой странице вам вообще не рады.
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
 @code {
     protected override async Task OnInitializedAsync()
     {
-        await AuthStateProvider.Logout();
+        try
+        {
+            await AuthStateProvider.Logout();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
         NavigationManager.NavigateTo("");
     }
 }

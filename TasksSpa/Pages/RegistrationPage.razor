@@ -2,27 +2,37 @@
 @inject NavigationManager NavigationManager
 @inject IdentityAuthStateProvider AuthStateProvider
 
-<section class="card card-default mx-auto w-50 mx-auto">
-    <h4 class="card-header">Регистрация</h4>
-    <label class="text-center text-danger">@Error</label>
-    <EditForm class="card-body" Model="@NewUser" OnValidSubmit="@Registration">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-        <div class="form-group">
-            <label for="login">Логин: </label>
-            <InputText @bind-Value="NewUser.Login" id="login" placeholder="Логин" />
+<AuthorizeView>
+    <Authorized>
+        <div class="alert alert-info text-center">
+            Знаете, конечно, похвально, что вы хотите регаться снова и снова и снова, но блин...<br/>
+            Хотя бы для приличия разлогиньтесь, что ли.
         </div>
-        <div class="form-group">
-            <label for="password">Пароль: </label>
-            <InputText @bind-Value="NewUser.Password" id="password" placeholder="******" type="password" />
-        </div>
-        <div class="form-group">
-            <label for="password2">Повтор пароля: </label>
-            <InputText @bind-Value="NewUser.PasswordRepeat" id="password2" placeholder="******" type="password" />
-        </div>
-        <input type="submit" class="btn btn-primary" value="Зарегистрироваться" />
-    </EditForm>
-</section>
+    </Authorized>
+    <NotAuthorized>
+        <section class="card card-default mx-auto w-50 mx-auto">
+            <h4 class="card-header">Регистрация</h4>
+            <label class="text-center text-danger">@Error</label>
+            <EditForm Context="RegFormContext" class="card-body" Model="@NewUser" OnValidSubmit="@Registration">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+                <div class="form-group">
+                    <label for="login">Логин: </label>
+                    <InputText @bind-Value="NewUser.Login" id="login" placeholder="Логин" />
+                </div>
+                <div class="form-group">
+                    <label for="password">Пароль: </label>
+                    <InputText @bind-Value="NewUser.Password" id="password" placeholder="******" type="password" />
+                </div>
+                <div class="form-group">
+                    <label for="password2">Повтор пароля: </label>
+                    <InputText @bind-Value="NewUser.PasswordRepeat" id="password2" placeholder="******" type="password" />
+                </div>
+                <input type="submit" class="btn btn-primary" value="Зарегистрироваться" />
+            </EditForm>
+        </section>
+    </NotAuthorized>
+</AuthorizeView>
 
 @code {
     private string Error { get; set; }
@@ -36,10 +46,15 @@
             await AuthStateProvider.Register(NewUser);
             NavigationManager.NavigateTo("");
         }
+        catch (RegistrationException)
+        {
+            Error = "Пользователь с таким логином уже существует";
+        }
         catch (Exception ex)
         {
-            Error = ex.Message;
-            StateHasChanged();
+            Error = "Произошла какая-то неведомая ерунда";
+            Console.WriteLine(ex.Message);
         }
+        StateHasChanged();
     }
 }
