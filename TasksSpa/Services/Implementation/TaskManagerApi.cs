@@ -14,8 +14,8 @@ namespace TasksSpa.Services.Implementation
     public class TaskManagerApi : ITaskManagerApi
     {
         private readonly HttpClient httpClient;
-        //private const string server = "https://todos-rest-api-server.herokuapp.com";
-        private const string server = "http://localhost:5000";
+        private const string server = "https://todos-rest-api-server.herokuapp.com";
+        //private const string server = "http://localhost:5000";
 
         public TaskManagerApi(HttpClient httpClient)
         {
