@@ -24,6 +24,7 @@
     private List<TaskDto> Tasks { get; set; }
     private List<TaskDto> FilteredTasks { get; set; }
     public EventCallback<TaskDto> TaskChanged { get; set; }
+    private Predicate<TaskDto> currentFilter = task => true;
 
     protected override async Task OnInitializedAsync()
     {
@@ -51,6 +52,8 @@
         {
             newTask.Id = await TaskManager.CreateTask(newTask, await AuthStateProvider.GetToken());
             Tasks.Add(newTask);
+            if (currentFilter.Invoke(newTask))
+                FilteredTasks.Add(newTask);
         }
         catch (NotAcceptableException)
         {
@@ -132,26 +135,26 @@
     {
         if (Tasks == null)
             return;
-        Predicate<TaskDto> predicate = null;
+        currentFilter = task => true;
         switch (filter)
         {
             case Filters.All:
                 {
-                    predicate = task => task.Title.StartsWith(filterText);
+                    currentFilter = task => task.Title.StartsWith(filterText);
                     break;
                 }
             case Filters.Finished:
                 {
-                    predicate = task => task.IsFinished && task.Title.StartsWith(filterText);
+                    currentFilter = task => task.IsFinished && task.Title.StartsWith(filterText);
                     break;
                 }
             case Filters.Unfinished:
                 {
-                    predicate = task => !task.IsFinished && task.Title.StartsWith(filterText);
+                    currentFilter = task => !task.IsFinished && task.Title.StartsWith(filterText);
                     break;
                 }
         }
-        FilteredTasks = Tasks.Where(task => predicate.Invoke(task)).ToList();
+        FilteredTasks = Tasks.Where(task => currentFilter.Invoke(task)).ToList();
         StateHasChanged();
     }
 }
