@@ -11,7 +11,7 @@
         }
         else
         {
-            <input @bind="Task.IsFinished" type="checkbox" />
+            <input @bind="TaskState" type="checkbox" />
             <a class="ml-auto @TaskStatusClass" href="tasks/@Task.Id">@Task.Title</a>
 
             <button class="btn btn-danger btn-sm btn-remove-todo ml-auto" @onclick="RemoveTask">Удалить</button>
@@ -45,6 +45,7 @@
         ProcessingQuery = true;
         await TaskStatusChanged.InvokeAsync(Task);
         ProcessingQuery = false;
+        StateHasChanged();
     }
 
     private async Task RemoveTask()

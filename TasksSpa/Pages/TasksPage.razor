@@ -6,9 +6,9 @@
 
 <div class="container">
     <label class="text-center text-danger">@Error</label>
-    <div class="row">
+    <div class="d-flex flex-row align-items-start justify-content-around">
         <TaskForm AcceptBtnText="Добавить" TaskSaved="AddTask" DropOnSave="true" Header="Добавление задачи" />
-        <div class="rowcard card-default w-50 mx-auto col-sm">
+        <div class="card card-default w-50 mx-auto col-sm">
             <h1 class="text-center">Список задач</h1>
             <section id="section-container">
                 <FilteringComponent OnFilterChanged="FilterChanged" />
