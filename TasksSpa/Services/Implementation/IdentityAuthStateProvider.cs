@@ -22,29 +22,29 @@ namespace TasksSpa.Services.Implementation
 
         public async Task Login(LoginParams loginParameters)
         {
-			await localStorage.SetItem("token", await authorizationApi.Login(loginParameters));
-			NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+            await localStorage.SetItem("token", await authorizationApi.Login(loginParameters));
+            NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
         }
 
         public async Task Register(RegistrationParams registerParameters)
         {
-			await authorizationApi.Register(registerParameters);
-			NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+            await authorizationApi.Register(registerParameters);
+            NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
         }
 
         public async Task Logout()
         {
-			await authorizationApi.Logout();
-			userInfoCache = null;
-			await localStorage.RemoveItem("token");
-			NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+            await authorizationApi.Logout();
+            userInfoCache = null;
+            await localStorage.RemoveItem("token");
+            NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
         }
 
         private async Task<UserDto> GetUserInfo()
         {
             if (userInfoCache != null && userInfoCache.IsAuthenticated) return userInfoCache;
-			userInfoCache = await authorizationApi.GetUserInfo(await localStorage.GetItem<string>("token"));
-			return userInfoCache;
+            userInfoCache = await authorizationApi.GetUserInfo(await localStorage.GetItem<string>("token"));
+            return userInfoCache;
         }
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()

@@ -6,170 +6,176 @@
 
 <div class="container">
     <label class="text-center text-danger">@Error</label>
-	<div class="d-flex flex-row align-items-start justify-content-around">
-		<TaskForm AcceptBtnText="Добавить" TaskSaved="AddTask" DropOnSave="true" Header="Добавление задачи" />
-		@if (Tasks.Count > 0)
-		{
-			<div class="card card-default w-50 mx-auto col-sm">
-				<h1 class="text-center">Список задач</h1>
-				<section id="section-container">
-					<FilteringComponent OnFilterChanged="FilterChanged" />
-					<TaskList @bind -Tasks="FilteredTasks" TaskStatusChanged="ChangeTaskStatus" TaskRemoval="RemoveTask" />
-				</section>
-			</div>
-		}
-		else
-		{
-			<div class="alert alert-info text-center">
-				Задач нету, но вы держитесь там.
-			</div>
-		}
-	</div>
+    <div class="d-flex flex-row align-items-start justify-content-around">
+        <TaskForm AcceptBtnText="Добавить" TaskSaved="AddTask" DropOnSave="true" Header="Добавление задачи" />
+        @if (Tasks.Count > 0)
+        {
+            <div class="card card-default w-50 mx-auto col-sm">
+                <h1 class="text-center">Список задач</h1>
+                <section id="section-container">
+                    <FilteringComponent OnFilterChanged="FilterChanged" />
+                    <TaskList @bind -Tasks="FilteredTasks" TaskStatusChanged="ChangeTaskStatus" TaskRemoval="RemoveTask" />
+                </section>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info text-center">
+                Задач нету, но вы держитесь там.
+            </div>
+        }
+    </div>
 </div>
 
 @code {
     private string Error { get; set; }
     private TaskDto AddedTask { get; set; }
-    private List<TaskDto> Tasks { get; set; }
-    private List<TaskDto> FilteredTasks { get; set; }
-    public EventCallback<TaskDto> TaskChanged { get; set; }
-    private Predicate<TaskDto> currentFilter = task => true;
+    private List<TaskDto>
+    Tasks { get; set; }
+    private List<TaskDto>
+        FilteredTasks { get; set; }
+        public EventCallback<TaskDto>
+            TaskChanged { get; set; }
+            private Predicate<TaskDto>
+                currentFilter = task => true;
 
-    protected override async Task OnInitializedAsync()
-    {
-        try
-        {
-            Tasks = new List<TaskDto>(await TaskManager.GetTasks(await AuthStateProvider.GetToken()));
-            FilteredTasks = new List<TaskDto>(Tasks);
-        }
-        catch (NotAuthenticatedException)
-        {
-            Error = "Только пользователи могут запрашивать задачи";
-        }
-        catch (Exception e)
-        {
-            Error = "Произошла какая-то неведомая ерунда";
-            Console.WriteLine(e.Message);
-        }
-        StateHasChanged();
-    }
-
-    private async Task AddTask(TaskDto newTask)
-    {
-        Error = null;
-        try
-        {
-            newTask.Id = await TaskManager.CreateTask(newTask, await AuthStateProvider.GetToken());
-            Tasks.Add(newTask);
-            if (currentFilter.Invoke(newTask))
-                FilteredTasks.Add(newTask);
-        }
-        catch (NotAcceptableException)
-        {
-            Error = "Задача с таким заголовком уже существует";
-        }
-        catch (NotAuthenticatedException)
-        {
-            Error = "Только пользователи могут добавлять задачи";
-        }
-        catch (Exception e)
-        {
-            Error = "Произошла какая-то неведомая ерунда";
-            Console.WriteLine(e.Message);
-        }
-        StateHasChanged();
-    }
-
-    private async Task ChangeTaskStatus(TaskDto changedTask)
-    {
-        try
-        {
-            await TaskManager.ChangeStatus(changedTask, await AuthStateProvider.GetToken());
-            changedTask.IsFinished = !changedTask.IsFinished;
-        }
-        catch (NotAuthorizedException)
-        {
-            Error = "Ай-ай-ай, нехорошо изменить статус чужой задачи";
-        }
-        catch (NotFoundException)
-        {
-            Error = "Странно, но задача на изменение не была найдена. Видать, пора её убрать";
-            Tasks.Remove(changedTask);
-            if (currentFilter.Invoke(changedTask))
-                FilteredTasks.Remove(changedTask);
-        }
-        catch (NotAcceptableException)
-        {
-            Error = "Только пользователи могут добавлять задачи";
-        }
-        catch (NotAuthenticatedException)
-        {
-            Error = "Только пользователи могут изменять статус задач";
-        }
-        catch (Exception e)
-        {
-            Error = "Похоже, нет соединения с сервером";
-            Console.WriteLine(e.Message);
-        }
-        StateHasChanged();
-    }
-
-    private async Task RemoveTask(TaskDto removedTask)
-    {
-        try
-        {
-            await TaskManager.RemoveTask(removedTask.Id, await AuthStateProvider.GetToken());
-            Tasks.Remove(removedTask);
-            if (currentFilter.Invoke(removedTask))
-                FilteredTasks.Remove(removedTask);
-        }
-        catch (NotAuthorizedException)
-        {
-            Error = "Ай-ай-ай, нехорошо пытаться удалить чужую задачу";
-        }
-        catch (NotAuthenticatedException)
-        {
-            Error = "Только пользователи могут добавлять задачи";
-        }
-        catch (NotFoundException)
-        {
-            Error = "Странно, но задача на удаление не была найдена. Видать, пора её убрать";
-            Tasks.Remove(removedTask);
-            if (currentFilter.Invoke(removedTask))
-                FilteredTasks.Remove(removedTask);
-        }
-        catch (Exception e)
-        {
-            Error = "Похоже, нет соединения с сервером";
-            Console.WriteLine(e.Message);
-        }
-        StateHasChanged();
-    }
-
-    private void FilterChanged(string filterText, Filters filter)
-    {
-        if (Tasks == null)
-            return;
-        currentFilter = task => true;
-        switch (filter)
-        {
-            case Filters.All:
+                protected override async Task OnInitializedAsync()
                 {
-                    currentFilter = task => task.Title.StartsWith(filterText);
-                    break;
-                }
-            case Filters.Finished:
+                try
                 {
-                    currentFilter = task => task.IsFinished && task.Title.StartsWith(filterText);
-                    break;
-                }
-            case Filters.Unfinished:
-                {
-                    currentFilter = task => !task.IsFinished && task.Title.StartsWith(filterText);
-                    break;
-                }
-        }
-        FilteredTasks = Tasks.Where(task => currentFilter.Invoke(task)).ToList();
-        StateHasChanged();
-    }
-}
+                Tasks = new List<TaskDto>
+                    (await TaskManager.GetTasks(await AuthStateProvider.GetToken()));
+                    FilteredTasks = new List<TaskDto>
+                        (Tasks);
+                        }
+                        catch (NotAuthenticatedException)
+                        {
+                        Error = "Только пользователи могут запрашивать задачи";
+                        }
+                        catch (Exception e)
+                        {
+                        Error = "Произошла какая-то неведомая ерунда";
+                        Console.WriteLine(e.Message);
+                        }
+                        StateHasChanged();
+                        }
+
+                        private async Task AddTask(TaskDto newTask)
+                        {
+                        Error = null;
+                        try
+                        {
+                        newTask.Id = await TaskManager.CreateTask(newTask, await AuthStateProvider.GetToken());
+                        Tasks.Add(newTask);
+                        if (currentFilter.Invoke(newTask))
+                        FilteredTasks.Add(newTask);
+                        }
+                        catch (NotAcceptableException)
+                        {
+                        Error = "Задача с таким заголовком уже существует";
+                        }
+                        catch (NotAuthenticatedException)
+                        {
+                        Error = "Только пользователи могут добавлять задачи";
+                        }
+                        catch (Exception e)
+                        {
+                        Error = "Произошла какая-то неведомая ерунда";
+                        Console.WriteLine(e.Message);
+                        }
+                        StateHasChanged();
+                        }
+
+                        private async Task ChangeTaskStatus(TaskDto changedTask)
+                        {
+                        try
+                        {
+                        await TaskManager.ChangeStatus(changedTask, await AuthStateProvider.GetToken());
+                        changedTask.IsFinished = !changedTask.IsFinished;
+                        }
+                        catch (NotAuthorizedException)
+                        {
+                        Error = "Ай-ай-ай, нехорошо изменить статус чужой задачи";
+                        }
+                        catch (NotFoundException)
+                        {
+                        Error = "Странно, но задача на изменение не была найдена. Видать, пора её убрать";
+                        Tasks.Remove(changedTask);
+                        if (currentFilter.Invoke(changedTask))
+                        FilteredTasks.Remove(changedTask);
+                        }
+                        catch (NotAcceptableException)
+                        {
+                        Error = "Только пользователи могут добавлять задачи";
+                        }
+                        catch (NotAuthenticatedException)
+                        {
+                        Error = "Только пользователи могут изменять статус задач";
+                        }
+                        catch (Exception e)
+                        {
+                        Error = "Похоже, нет соединения с сервером";
+                        Console.WriteLine(e.Message);
+                        }
+                        StateHasChanged();
+                        }
+
+                        private async Task RemoveTask(TaskDto removedTask)
+                        {
+                        try
+                        {
+                        await TaskManager.RemoveTask(removedTask.Id, await AuthStateProvider.GetToken());
+                        Tasks.Remove(removedTask);
+                        if (currentFilter.Invoke(removedTask))
+                        FilteredTasks.Remove(removedTask);
+                        }
+                        catch (NotAuthorizedException)
+                        {
+                        Error = "Ай-ай-ай, нехорошо пытаться удалить чужую задачу";
+                        }
+                        catch (NotAuthenticatedException)
+                        {
+                        Error = "Только пользователи могут добавлять задачи";
+                        }
+                        catch (NotFoundException)
+                        {
+                        Error = "Странно, но задача на удаление не была найдена. Видать, пора её убрать";
+                        Tasks.Remove(removedTask);
+                        if (currentFilter.Invoke(removedTask))
+                        FilteredTasks.Remove(removedTask);
+                        }
+                        catch (Exception e)
+                        {
+                        Error = "Похоже, нет соединения с сервером";
+                        Console.WriteLine(e.Message);
+                        }
+                        StateHasChanged();
+                        }
+
+                        private void FilterChanged(string filterText, Filters filter)
+                        {
+                        if (Tasks == null)
+                        return;
+                        currentFilter = task => true;
+                        switch (filter)
+                        {
+                        case Filters.All:
+                        {
+                        currentFilter = task => task.Title.StartsWith(filterText);
+                        break;
+                        }
+                        case Filters.Finished:
+                        {
+                        currentFilter = task => task.IsFinished && task.Title.StartsWith(filterText);
+                        break;
+                        }
+                        case Filters.Unfinished:
+                        {
+                        currentFilter = task => !task.IsFinished && task.Title.StartsWith(filterText);
+                        break;
+                        }
+                        }
+                        FilteredTasks = Tasks.Where(task => currentFilter.Invoke(task)).ToList();
+                        StateHasChanged();
+                        }
+                        }

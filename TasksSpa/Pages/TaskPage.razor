@@ -7,22 +7,22 @@
 
 @if (CriticalError)
 {
-	<div class="alert alert-danger text-center">
-		@Error
-	</div>
+    <div class="alert alert-danger text-center">
+        @Error
+    </div>
 }
 else
 {
-	<div class="card">
-		<label class="text-center text-danger">@Error</label>
-		<TaskForm AcceptBtnText="Сохранить" Header="Редактирование задачи" @bind -Task="Task" DropOnSave="false" TaskSaved="@UpdateTask" />
-		<div class="card-default w-50 mx-auto">
-			<h2 class="text-center">Список комментариев</h2>
-			<section>
-				<CommentList @bind-Comments="Comments" />
-			</section>
-		</div>
-	</div>
+    <div class="card">
+        <label class="text-center text-danger">@Error</label>
+        <TaskForm AcceptBtnText="Сохранить" Header="Редактирование задачи" @bind -Task="Task" DropOnSave="false" TaskSaved="@UpdateTask" />
+        <div class="card-default w-50 mx-auto">
+            <h2 class="text-center">Список комментариев</h2>
+            <section>
+                <CommentList @bind -Comments="Comments" />
+            </section>
+        </div>
+    </div>
 }
 
 @code {
