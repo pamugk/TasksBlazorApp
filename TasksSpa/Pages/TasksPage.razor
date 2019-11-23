@@ -6,16 +6,25 @@
 
 <div class="container">
     <label class="text-center text-danger">@Error</label>
-    <div class="d-flex flex-row align-items-start justify-content-around">
-        <TaskForm AcceptBtnText="Добавить" TaskSaved="AddTask" DropOnSave="true" Header="Добавление задачи" />
-        <div class="card card-default w-50 mx-auto col-sm">
-            <h1 class="text-center">Список задач</h1>
-            <section id="section-container">
-                <FilteringComponent OnFilterChanged="FilterChanged" />
-                <TaskList @bind-Tasks="FilteredTasks" TaskStatusChanged="ChangeTaskStatus" TaskRemoval="RemoveTask" />
-            </section>
-        </div>
-    </div>
+	<div class="d-flex flex-row align-items-start justify-content-around">
+		<TaskForm AcceptBtnText="Добавить" TaskSaved="AddTask" DropOnSave="true" Header="Добавление задачи" />
+		@if (Tasks.Count > 0)
+		{
+			<div class="card card-default w-50 mx-auto col-sm">
+				<h1 class="text-center">Список задач</h1>
+				<section id="section-container">
+					<FilteringComponent OnFilterChanged="FilterChanged" />
+					<TaskList @bind -Tasks="FilteredTasks" TaskStatusChanged="ChangeTaskStatus" TaskRemoval="RemoveTask" />
+				</section>
+			</div>
+		}
+		else
+		{
+			<div class="alert alert-info text-center">
+				Задач нету, но вы держитесь там.
+			</div>
+		}
+	</div>
 </div>
 
 @code {

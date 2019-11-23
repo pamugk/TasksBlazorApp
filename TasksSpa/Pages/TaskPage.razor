@@ -5,16 +5,25 @@
 @inject ITaskManagerApi TaskManager
 @inject NavigationManager NavigationManager
 
-<div class="card">
-    <label class="text-center text-danger">@Error</label>
-    <TaskForm AcceptBtnText="Сохранить" Header="Редактирование задачи" @bind-Task="Task" DropOnSave="false" TaskSaved="@UpdateTask" />
-    <div class="card-default w-50 mx-auto">
-        <h2 class="text-center">Список комментариев</h2>
-        <section>
-            <CommentList @bind-Comments="Comments" />
-        </section>
-    </div>
-</div>
+@if (CriticalError)
+{
+	<div class="alert alert-danger text-center">
+		@Error
+	</div>
+}
+else
+{
+	<div class="card">
+		<label class="text-center text-danger">@Error</label>
+		<TaskForm AcceptBtnText="Сохранить" Header="Редактирование задачи" @bind -Task="Task" DropOnSave="false" TaskSaved="@UpdateTask" />
+		<div class="card-default w-50 mx-auto">
+			<h2 class="text-center">Список комментариев</h2>
+			<section>
+				<CommentList @bind-Comments="Comments" />
+			</section>
+		</div>
+	</div>
+}
 
 @code {
     private CommentDto[] Comments { get; set; }
@@ -22,6 +31,7 @@
     [Parameter]
     public int Id { get; set; }
     private TaskDto Task { get; set; }
+	private bool CriticalError { get;set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -34,14 +44,17 @@
         catch (NotAuthorizedException)
         {
             Error = "У вас нет прав на получение этой задачи";
+			CriticalError = true;
         }
         catch (NotFoundException)
         {
-            Error = "Задача не найдена";
+            Error = "У вас нет прав на получение этой задачи";
+			CriticalError = true;
         }
         catch (NotAuthenticatedException)
         {
             Error = "Только пользователи могут получать свои задачи";
+			CriticalError = true;
         }
         catch (Exception e)
         {
@@ -60,20 +73,24 @@
         }
         catch (NotAuthorizedException)
         {
-            Error = "Ай-ай-ай, нехорошо изменить статус чужой задачи";
+            Error = "Ай-ай-ай, нехорошо изменять статус чужой задачи";
+			CriticalError = true;
         }
         catch (NotFoundException)
         {
             Error = "Странно, но задача на изменение не была найдена. Видать, тут больше делать нечего";
+			CriticalError = true;
             NavigationManager.NavigateTo("tasks");
         }
         catch (NotAcceptableException)
         {
             Error = "Только пользователи могут добавлять задачи";
+			CriticalError = true;
         }
         catch (NotAuthenticatedException)
         {
-            Error = "Только пользователи могут изменять статус задач";
+            Error = "Только пользователи могут изменять задачу";
+			CriticalError = true;
         }
         catch (Exception e)
         {

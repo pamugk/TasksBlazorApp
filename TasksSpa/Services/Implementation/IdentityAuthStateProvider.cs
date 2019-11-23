@@ -22,59 +22,29 @@ namespace TasksSpa.Services.Implementation
 
         public async Task Login(LoginParams loginParameters)
         {
-            try
-            {
-                await localStorage.SetItem("token", await authorizationApi.Login(loginParameters));
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-            NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+			await localStorage.SetItem("token", await authorizationApi.Login(loginParameters));
+			NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
         }
 
         public async Task Register(RegistrationParams registerParameters)
         {
-            try
-            {
-                await authorizationApi.Register(registerParameters);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-            NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+			await authorizationApi.Register(registerParameters);
+			NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
         }
 
         public async Task Logout()
         {
-            try
-            {
-                await authorizationApi.Logout();
-                userInfoCache = null;
-                await localStorage.RemoveItem("token");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-            NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+			await authorizationApi.Logout();
+			userInfoCache = null;
+			await localStorage.RemoveItem("token");
+			NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
         }
 
         private async Task<UserDto> GetUserInfo()
         {
             if (userInfoCache != null && userInfoCache.IsAuthenticated) return userInfoCache;
-            try
-            {
-                userInfoCache = await
-                authorizationApi
-                .GetUserInfo(await localStorage.GetItem<string>("token"));
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-            }
-            return userInfoCache;
+			userInfoCache = await authorizationApi.GetUserInfo(await localStorage.GetItem<string>("token"));
+			return userInfoCache;
         }
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()

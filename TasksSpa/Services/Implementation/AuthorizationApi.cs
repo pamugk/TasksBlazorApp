@@ -31,7 +31,13 @@ namespace TasksSpa.Services.Implementation
             var stringContent = new StringContent(JsonSerializer.Serialize(loginParameters), Encoding.UTF8, "application/json");
             var response = await httpClient.PostAsync($"{server}/api/login", stringContent);
             var body = await response.Content.ReadAsStringAsync();
-            if (!response.IsSuccessStatusCode) throw new NotAuthenticatedException(body);
+			switch (response.StatusCode)
+			{
+				case HttpStatusCode.OK:
+					break;
+				case HttpStatusCode.Unauthorized:
+					throw new NotAuthenticatedException(body);
+			}
             return body;
         }
 
