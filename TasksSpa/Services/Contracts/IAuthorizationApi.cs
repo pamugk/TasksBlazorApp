@@ -7,7 +7,7 @@ namespace TasksSpa.Services.Contracts
     {
         Task<string> Login(LoginParams loginParameters);
         Task Register(RegistrationParams registerParameters);
-        Task Logout();
+        Task Logout(string token);
         Task<UserDto> GetUserInfo(string token);
     }
 }

@@ -1,30 +1,30 @@
-﻿<div class="card card-default w-50 mx-auto col-sm">
+﻿<div class="card card-default mx-3 w-auto">
     @if (ProcessingQuery)
     {
-        <StandbyMessage/>
+        <StandbyMessage />
     }
     else
     {
         <h4 class="card-header">@Header</h4>
-        <EditForm Model="@taskModel" OnValidSubmit="@Accept">
+        <EditForm class="card-body" Model="@taskModel" OnValidSubmit="@Accept">
             <DataAnnotationsValidator />
             <ValidationSummary />
             <div class="form-group">
-                <label for="title">Заголовок: </label>
-                <InputText @bind-Value="taskModel.Title" id="title" placeholder="Заголовок" />
+                <label for="title">Заголовок</label>
+                <InputText @bind-Value="taskModel.Title" class="form-control" id="title" placeholder="Заголовок" />
             </div>
             <div class="form-group">
-                <label for="title">Описание: </label>
-                <InputText @bind-Value="taskModel.Description" id="description" placeholder="Такая-то задача" />
+                <label for="title">Описание</label>
+                <InputText @bind-Value="taskModel.Description" class="form-control" id="description" placeholder="Такая-то задача" />
             </div>
             @if (Task != null)
             {
-                <div class="form-group">
-                    <label for="finished">Задача завершена: </label>
-                    <InputCheckbox id="finished" @bind-Value="taskModel.IsFinished" />
+                <div class="form-check">
+                    <InputCheckbox @bind-Value="taskModel.IsFinished" class="form-check-input" id="finished" />
+                    <label class="form-check-label" for="finished">Задача завершена</label>
                 </div>
             }
-            <input type="submit" class="btn btn-primary" value="@AcceptBtnText" />
+            <input class="btn btn-primary" type="submit" value="@AcceptBtnText" />
         </EditForm>
     }
 </div>

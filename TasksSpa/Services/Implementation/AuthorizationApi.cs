@@ -41,9 +41,9 @@ namespace TasksSpa.Services.Implementation
             return body;
         }
 
-        public async Task Logout()
+        public async Task Logout(string token)
         {
-            await httpClient.PostAsync($"{server}/api/logout", null);
+            await httpClient.PostAsync($"{server}/api/logout?token={WebUtility.UrlEncode(token)}", new StringContent(""));
         }
 
         public async Task Register(RegistrationParams registerParameters)

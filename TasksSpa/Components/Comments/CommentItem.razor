@@ -1,15 +1,17 @@
-﻿<li class="d-flex flex-column list-group-item list-group-item-action">
+﻿<li class="card list-group-item list-group-item-action">
     @if (Comment == null)
     {
-        <p class="text-error">Комментария почему-то нету :(</p>
+        <div class="card-body my-1">
+            <p class="text-error">Комментария почему-то нету :(</p>
+        </div>
     }
     else
     {
-        <strong>@Comment.Name</strong><b />
-        <address>
-            <a href="mailto:#">@Comment.Email</a>
-        </address>
-        <span>@Comment.Body</span>
+        <div class="card-body">
+            <strong class="card-title my-1">@Comment.Name</strong><b />
+            <address class="card-subtitle my-1"><a href="mailto:#">@Comment.Email</a></address>
+            <p class="card-text my-1">@Comment.Body</p>
+        </div>
     }
 </li>
 

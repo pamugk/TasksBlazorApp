@@ -1,7 +1,7 @@
-﻿<li class="d-flex list-group-item list-group-item-action">
+﻿<li class="d-flex list-group-item list-group-item-action my-1">
     @if (ProcessingQuery)
     {
-        <LoadingSpinner />
+        <LoadingSpinner Enabled="true"/>
     }
     else
     {
@@ -12,7 +12,7 @@
         else
         {
             <input @bind="TaskState" type="checkbox" />
-            <a class="ml-auto @TaskStatusClass" href="tasks/@Task.Id">@Task.Title</a>
+            <a class="ml-auto @TaskStatusClass text-wrap" href="tasks/@Task.Id">@Task.Title</a>
 
             <button class="btn btn-danger btn-sm btn-remove-todo ml-auto" @onclick="RemoveTask">Удалить</button>
         }

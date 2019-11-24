@@ -34,7 +34,7 @@ namespace TasksSpa.Services.Implementation
 
         public async Task Logout()
         {
-            await authorizationApi.Logout();
+            await authorizationApi.Logout(await GetToken());
             userInfoCache = null;
             await localStorage.RemoveItem("token");
             NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());

@@ -4,13 +4,13 @@
 
 <AuthorizeView>
     <Authorized>
-        <div class="alert alert-info text-center">
+        <div class="alert alert-info mx-auto my-auto text-center">
             Знаете, конечно, похвально, что вы хотите регаться снова и снова и снова, но блин...<br />
             Хотя бы для приличия разлогиньтесь, что ли.
         </div>
     </Authorized>
     <NotAuthorized>
-        <section class="card card-default w-50 mx-auto">
+        <section class="card card-default mx-auto my-auto">
             @if (ProcessingQuery)
             {
                 <StandbyMessage />
@@ -19,18 +19,18 @@
             {
                 <h4 class="card-header">Вход</h4>
                 <label class="text-center text-danger">@Error</label>
-                <EditForm Context="LoginFormContext" class="card-body" Model="@User" OnValidSubmit="@LogIn">
+                <EditForm class="card-body" Context="LoginFormContext" Model="@User" OnValidSubmit="@LogIn">
                     <DataAnnotationsValidator />
                     <ValidationSummary />
                     <div class="form-group">
-                        <label for="login">Логин: </label>
-                        <InputText @bind-Value="User.Login" id="login" placeholder="Логин" />
+                        <label for="login">Логин</label>
+                        <InputText @bind-Value="User.Login" class="form-control" id="login" placeholder="Логин" />
                     </div>
                     <div class="form-group">
-                        <label for="password">Пароль: </label>
-                        <InputText @bind-Value="User.Password" id="password" placeholder="******" type="password" />
+                        <label for="password">Пароль</label>
+                        <InputText @bind-Value="User.Password" class="form-control" id="password" placeholder="******" type="password" />
                     </div>
-                    <input type="submit" class="btn btn-primary" value="Войти" />
+                    <input class="btn btn-primary" type="submit" value="Войти" />
                 </EditForm>
             }
         </section>

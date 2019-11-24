@@ -13,16 +13,21 @@
 }
 else
 {
-    <div class="card">
-        <label class="text-center text-danger">@Error</label>
-        <TaskForm AcceptBtnText="Сохранить" Header="Редактирование задачи" @bind -Task="Task" DropOnSave="false" TaskSaved="@UpdateTask" />
-        <div class="card-default w-50 mx-auto">
-            <h2 class="text-center">Список комментариев</h2>
-            <section>
-                <CommentList @bind -Comments="Comments" />
-            </section>
+    @if (IsLoading)
+    {
+        <LoadingSpinner Enabled="true" />
+    }
+    else
+    {
+        <div class="d-flex flex-column">
+            <label class="text-center text-danger">@Error</label>
+            <TaskForm AcceptBtnText="Сохранить" Header="Редактирование задачи" @bind-Task="Task" DropOnSave="false" TaskSaved="@UpdateTask" />
+            <div class="card card-default mt-3">
+                <h2 class="text-center">Список комментариев</h2>
+                <CommentList @bind-Comments="Comments" />
+            </div>
         </div>
-    </div>
+    }
 }
 
 @code {
@@ -31,30 +36,34 @@ else
     [Parameter]
     public int Id { get; set; }
     private TaskDto Task { get; set; }
-	private bool CriticalError { get;set; }
+    private bool CriticalError { get; set; }
+    private bool IsLoading { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         Error = null;
         try
         {
+            IsLoading = true;
             Task = await TaskManager.GetTask(Id, await AuthStateProvider.GetToken());
+            IsLoading = false;
+            StateHasChanged();
             Comments = await TaskManager.GetComments(Id);
         }
         catch (NotAuthorizedException)
         {
             Error = "У вас нет прав на получение этой задачи";
-			CriticalError = true;
+            CriticalError = true;
         }
         catch (NotFoundException)
         {
             Error = "У вас нет прав на получение этой задачи";
-			CriticalError = true;
+            CriticalError = true;
         }
         catch (NotAuthenticatedException)
         {
-            Error = "Только пользователи могут получать свои задачи";
-			CriticalError = true;
+            Error = "Похоже, время вашей сессии вышло";
+            await AuthStateProvider.Logout();
         }
         catch (Exception e)
         {
@@ -74,23 +83,24 @@ else
         catch (NotAuthorizedException)
         {
             Error = "Ай-ай-ай, нехорошо изменять статус чужой задачи";
-			CriticalError = true;
+            CriticalError = true;
         }
         catch (NotFoundException)
         {
             Error = "Странно, но задача на изменение не была найдена. Видать, тут больше делать нечего";
-			CriticalError = true;
+            CriticalError = true;
             NavigationManager.NavigateTo("tasks");
         }
         catch (NotAcceptableException)
         {
-            Error = "Только пользователи могут добавлять задачи";
-			CriticalError = true;
+            Error = "Похоже, задача с таким заголовком уже есть";
+            CriticalError = true;
         }
         catch (NotAuthenticatedException)
         {
-            Error = "Только пользователи могут изменять задачу";
-			CriticalError = true;
+            Error = "Похоже, время вашей сессии вышло";
+            CriticalError = true;
+            await AuthStateProvider.Logout();
         }
         catch (Exception e)
         {
