@@ -1,0 +1,54 @@
+﻿<li class="d-flex list-group-item list-group-item-action my-1">
+    @if (ProcessingQuery)
+    {
+        <LoadingSpinner Enabled="true"/>
+    }
+    else
+    {
+        @if (Task == null)
+        {
+            <p class="text-error">Задачи почему-то нету :(</p>
+        }
+        else
+        {
+            <input @bind="TaskState" type="checkbox" />
+            <a class="ml-auto @TaskStatusClass text-wrap" href="tasks/@Task.Id">@Task.Title</a>
+
+            <button class="btn btn-danger btn-sm btn-remove-todo ml-auto" @onclick="RemoveTask">Удалить</button>
+        }
+    }
+</li>
+
+@code {
+    [Parameter]
+    public TaskDto Task { get; set; }
+    [Parameter]
+    public EventCallback<TaskDto> TaskChanged { get; set; }
+    private bool TaskState
+    {
+        get => Task.IsFinished;
+        set => ChangeStatus();
+    }
+    [Parameter]
+    public EventCallback<TaskDto> TaskStatusChanged { get; set; }
+    [Parameter]
+    public EventCallback<TaskDto> TaskRemoval { get; set; }
+    private bool ProcessingQuery { get; set; }
+
+    private string TaskStatusClass => Task.IsFinished ? "completed-task" : null;
+
+    private async Task ChangeStatus()
+    {
+        ProcessingQuery = true;
+        await TaskStatusChanged.InvokeAsync(Task);
+        ProcessingQuery = false;
+        StateHasChanged();
+    }
+
+    private async Task RemoveTask()
+    {
+        ProcessingQuery = true;
+        await TaskRemoval.InvokeAsync(Task);
+        ProcessingQuery = false;
+    }
+}

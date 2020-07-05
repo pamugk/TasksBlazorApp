@@ -1,0 +1,29 @@
+﻿<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="">TodosSpa</a>
+
+    <ul class="navbar-nav mr-auto">
+        <NavItem Classes="oi oi-home" Link="" Match="NavLinkMatch.All" Text="Главная" />
+        <AuthorizeView>
+            <Authorized>
+                <NavItem Classes="oi oi-list-rich" Link="tasks" Text="Задачи" />
+            </Authorized>
+        </AuthorizeView>
+        <NavItem Classes="oi oi-info" Link="about" Text="О сайте" />
+    </ul>
+
+    <ul class="navbar-nav ml-auto">
+        <AuthorizeView>
+            <Authorized>
+                <NavItem Classes="oi oi-person" Link="" Text="@context.User.Identity.Name" />
+                <NavItem Classes="oi oi-account-logout" Link="logout" Text="Выход" />
+            </Authorized>
+            <NotAuthorized>
+                <NavItem Classes="oi oi-account-login" Link="login" Text="Вход" />
+                <NavItem Classes="oi oi-plus" Link="registration" Text="Регистрация" />
+            </NotAuthorized>
+            <Authorizing>
+                <LoadingSpinner Enabled="true"/>
+            </Authorizing>
+        </AuthorizeView>
+    </ul>
+</nav>
